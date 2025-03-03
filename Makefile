@@ -54,8 +54,10 @@ MKDIR_P	= mkdir -p
 
 all: setup ## Build project
 
-setup:
+setup: check
 	./setup.sh
+
+check: check_host check_volumes ## Check Docker Status
 
 check_volumes: ## Check Docker Volumes
 	@echo "$(CYA)Checking Docker Volumes...$(D)"
@@ -64,9 +66,23 @@ check_volumes: ## Check Docker Volumes
 		echo "* $(YEL)Creating $(CYA)$(HOME)/data/db$(D) & $(CYA)$(HOME)/data/wp$(D) folders:$(D) $(_SUCCESS)"; \
 		$(MKDIR_P) $(HOME)/data/db $(HOME)/data/wp; \
 	else \
-		echo " $(RED)$(D) [$(GRN)Volumes are mounted!$(D)]"; \
+	echo " $(RED)$(D) [$(GRN)Volumes are mounted at:$(D)]"; \
+		echo "* $(YEL)$(HOME)/data/db$(D) & $(YEL)$(HOME)/data/wp$(D)"; \
 	fi
 
+check_host:		## Check Docker Hosts
+	@if ! grep -q '127.0.0.1 $(USER).42.pt $(USER).42.fr' /etc/hosts; then \
+		echo " $(RED)$(D) [$(GRN)Adding host entry!$(D)]"; \
+		echo "127.0.0.1 $(USER).42.pt $(USER).42.fr" | sudo tee -a /etc/hosts; \
+	else \
+		echo " $(RED)$(D) [$(GRN)Host entry already exists!$(D)]"; \
+		echo "* $(YEL)127.0.0.1$(D) $(USER).42.pt $(USER).42.fr"; \
+	fi
+
+up: check
+	@echo "$(CYA)Docker Compose $(GRN)UP$(D)..."
+	docker-compose -f $(DOCKER_PATH) up --build && \
+		trap "make stop" EXIT
 
 ##@ Test Rules 🧪
 

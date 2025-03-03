@@ -34,15 +34,16 @@ while ! mysqladmin --socket="${SOCKET_FILE}" ping >/dev/null 2>&1; do
     sleep 2
 done
 
-SECRETS_ENC="/run/secrets/secrets.enc"
 SECRETS_FILE="/run/secrets/secrets.txt"
+SECRETS_ENC="/run/secrets/secrets.enc"
 
 # Create a security scope for handling secrets safely
 (
     # Decrypt secrets file using the secret key
-    if [ -f $SECRETS_ENC ]; then
-        openssl enc -aes-256-cbc -d -pbkdf2 -in $SECRETS_ENC -out $SECRETS_FILE -pass pass:$(cat /run/secrets/secret_key)
-        if [ $? -ne 0]; then
+    if [ -f "$SECRETS_ENC" ]; then
+        openssl enc -aes-256-cbc -d -pbkdf2 -iter 100000 -in "$SECRETS_ENC" -out "$SECRETS_FILE" \
+            -pass pass:"$(cat /run/secrets/secret_key)"
+        if [ $? -ne 0 ]; then
             echo "Error: Failed to decrypt secrets file"
             exit 1
         fi
@@ -52,22 +53,42 @@ SECRETS_FILE="/run/secrets/secrets.txt"
     fi
 
     # Protect temporary secret files
-    chmod 600 $SECRETS_FILE
+    chmod 600 "$SECRETS_FILE"
 
     # Extract secrets and send them into environment variables
-    MYSQL_ROOT_PASSWORD=$(grep 'db_root_password=' $SECRETS_FILE | cut -d '=' -f2)
-    MYSQL_PASSWORD=$(grep 'db_password=' $SECRETS_FILE | cut -d '=' -f2)
+    MYSQL_ROOT_PASSWORD=$(grep '^db_root_password=' "$SECRETS_FILE" | cut -d '=' -f2)
+    MYSQL_PASSWORD=$(grep '^db_password=' "$SECRETS_FILE" | cut -d '=' -f2)
 
     # Remove secrets file
-    rm $SECRETS_FILE
+    rm "$SECRETS_FILE"
 
     # Apply Database configuration
+    # Create the database if it does not already exist
     mysql --socket="$SOCKET_FILE" -u root -p"$MYSQL_ROOT_PASSWORD" \
         -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};" -h localhost
-    #### More config
 
-    # Sutdown MariaDB background process
-    mysqladmin   --socket="$SOCKET_FILE" -u root -p"$MYSQL_ROOT_PASSWORD" shutdown
+    # Create a new user for database access if it does not already exist
+    mysql --socket="$SOCKET_FILE" -u root -p"$MYSQL_ROOT_PASSWORD" \
+        -e "CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';" -h localhost
+
+    # Grant all privileges on the database to the newly created user
+    mysql --socket="$SOCKET_FILE" -u root -p"${MYSQL_ROOT_PASSWORD}" \
+        -e "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';" -h localhost
+
+    # Grant root user access from any host with the provided password
+    mysql --socket="$SOCKET_FILE" -u root -p"${MYSQL_ROOT_PASSWORD}" \
+        -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';" -h localhost
+
+    # Ensure the root user is assigned the correct password for localhost authentication
+    mysql --socket="$SOCKET_FILE" -u root -p"${MYSQL_ROOT_PASSWORD}" \
+        -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';" -h localhost
+
+    # Apply all privilege changes to take effect immediately
+    mysql --socket="$SOCKET_FILE" -u root -p"${MYSQL_ROOT_PASSWORD}" \
+        -e "FLUSH PRIVILEGES;" -h localhost
+
+    # Shutdown MariaDB background process
+    mysqladmin --socket="$SOCKET_FILE" -u root -p"$MYSQL_ROOT_PASSWORD" shutdown
     echo "MariaDB shutdown successfully."
 )
 
