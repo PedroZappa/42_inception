@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Entrypoint script for MariaDB docker image
+
 SOCKET_PATH="/var/run/mysqld"
 SOCKET_FILE="${SOCKET_PATH}/mysqld.sock"
 DATA_PATH="/var/lib/mysql"

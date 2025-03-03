@@ -79,13 +79,16 @@ services:
 
     secrets:
       - secret_key
+
     env_file:
       - ~/secrets/.env
+
     restart:
       on-failure:7
 
     expose:
       - "9000"
+
     networks:
       - inception
 
@@ -100,23 +103,22 @@ services:
     build: ./requirements/nginx
     container_name: nginx
     image: nginx:42
-    depends_on:
-      - wordpress
     volumes:
       - wp_data:/var/www/html/wordpress
 
-    env_file:
-      - ~/secrets/.env
     restart:
-      on-failure:7
-
+      on-failure:5
     ports:
       - "443:443"
+    depends_on:
+      - wordpress
+    env_file:
+      - ~/secrets/.env
     networks:
       - inception
 
     logging:
       driver: json-file
       options:
-        max-size: "7m"
-        max-file: "7"
+        max-size: "10m"
+        max-file: "3"
