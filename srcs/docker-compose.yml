@@ -3,6 +3,27 @@ services:
     build: ./requirements/mariadb
     container_name: mariadb
     image: mariadb
+    volumes:
+      - db_data:/var/lib/mysql
+      - ~/secrets/secrets.enc:/run/secrets/secrets.enc:ro
+    secrets:
+      - secret_key
+    env_file:
+      - ~/secrets/.env
+    restart:
+      on-failure:5
     expose:
       - "3306"
+    networks:
+      - inception
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 11s
+      timeout: 7s
+      retries: 7
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
 
