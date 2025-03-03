@@ -49,6 +49,8 @@ WP_USER=wpu
 # FTP
 FTP_USER=ftpuser
 # IRC
+URICD_ADMIN=uricdadmin
+URICD_USER=uricduser
 EOF
 
     echo "Created .env file: $env_file"

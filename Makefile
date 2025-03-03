@@ -106,6 +106,16 @@ down: ## Bring down Docker Network
 
 ##@ Debug Rules 
 
+status: ## Get Network Status
+	@echo "$(CYA)Docker $(GRN)STATUS$(D)..."
+	docker ps -a
+	@echo ""
+	docker image ls
+	@echo ""
+	docker volume ls
+	@echo ""
+	docker network ls
+	@echo ""
 
 ##@ Clean-up Rules 󰃢
 
@@ -117,6 +127,10 @@ rmi: ## Remove Docker Network
 rmv: ## Remove Docker Volumes
 	echo "$(CYA)Docker Compose $(GRN)RMV$(D): remove volumes..."
 	docker compose -f $(DOCKER_PATH) down --volumes
+
+prune: fclean ## Prune Docker System
+	echo "$(CYA)Docker Compose $(GRN)PRUNE$(D): prune system..."
+	docker system prune -a
 
 clean: 				## Remove object files
 	@echo "*** $(YEL)Removing $(MAG)$(NAME)$(D)$(YEL)temporary files$(D)"

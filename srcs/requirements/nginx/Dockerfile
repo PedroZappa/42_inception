@@ -16,6 +16,8 @@ RUN apt-get install -y \
 COPY ./conf/nginx.conf /etc/nginx/sites-available/
 RUN ln -s /etc/nginx/sites-available/nginx.conf /etc/nginx/sites-enabled/
 
+COPY ../../index.html /var/www/html/index.html
+
 # Copy custom Entrypoint bash script
 COPY ./tools/entrypoint.sh /
 RUN chmod +x /entrypoint.sh
