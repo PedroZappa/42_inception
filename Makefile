@@ -79,7 +79,7 @@ check_host:		## Check Docker Hosts
 		echo "* $(YEL)127.0.0.1$(D) $(USER).42.pt $(USER).42.fr"; \
 	fi
 
-up: check
+up: setup
 	@echo "$(CYA)Docker Compose $(GRN)UP$(D)..."
 	docker-compose -f $(DOCKER_PATH) up --build && \
 		trap "make stop" EXIT

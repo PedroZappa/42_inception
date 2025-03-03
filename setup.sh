@@ -69,7 +69,8 @@ encrypt_secrets() {
     fi
     
     # Encrypt the file
-    openssl enc -aes-256-cbc -salt -in "$input_file" -out "$output_file" -pass file:"$key_file"
+    openssl enc -aes-256-cbc -pbkdf2 -iter 100000 -salt -in "$input_file" -out "$output_file" \
+        -pass file:"$key_file"
     
     echo "Encrypted secrets file created: $output_file"
 }

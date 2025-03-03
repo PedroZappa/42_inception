@@ -43,6 +43,7 @@ SECRETS_ENC="/run/secrets/secrets.enc"
 (
     # Decrypt secrets file using the secret key
     if [ -f "$SECRETS_ENC" ]; then
+        echo "Decrypting secrets file..."
         openssl enc -aes-256-cbc -d -pbkdf2 -iter 100000 -in "$SECRETS_ENC" -out "$SECRETS_FILE" \
             -pass pass:"$(cat /run/secrets/secret_key)"
         if [ $? -ne 0 ]; then
