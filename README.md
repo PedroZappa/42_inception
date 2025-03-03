@@ -36,6 +36,7 @@ ___
       * [Persistent Volumes](#persistent-volumes)
     * [Secrets Management](#secrets-management)
   * [Usage 🏁](#usage-)
+* [Docker Glossary 📖](#docker-glossary-)
 * [References 📚](#references-)
 * [License 📖](#license-)
 
@@ -137,7 +138,7 @@ ___
 - **Container Name**: 
     - `nginx`
 - **Dependencies**: Requires WordPress.
-- **Volumes**: `wpvol` for serving WordPress data.
+- **Volumes**: `wp_data` for serving WordPress data.
 - **@ Port**: `443`
 
 #### Persistent Volumes
@@ -169,17 +170,58 @@ ___
 git clone https://github.com/PedroZappa/42_inception.git
 cd 42_inception
 ```
-2. Build the Docker images:
+2. Setup .env and secrets:
+    - `secrets.txt`:
+```sh
+db_password=dbpassword
+db_root_password=dbrootpassword
+wp_admin_password=wpapassword
+wp_admin_email=passunca@student.42porto.com
+wp_user_password=wpupassword
+wp_user_email=pedrogzappa@gmail.com
+ftp_password=ftppassword
+
+```
+    - `.env`:
+```sh
+USER=passunca
+DOMAIN_NAME=${USER}.42.fr
+WWWLOCAL=/var/www/html/
+
+# SSL Certificates
+CERTS_=/etc/nginx/ssl/${USER}.crt
+
+# MySQL
+MYSQL_DATABASE=mariadb_db
+MYSQL_USER=user
+MYSQL_HOST=mariadb
+
+# WordPress
+WP_ADMIN=wpa
+WP_USER=wpu
+
+# FTP
+FTP_USER=ftpuser
+
+# IRC
+
+```
+
+3. Build the Docker images:
 ```bash
 docker-compose build
 ```
-3. Run containers:
+4. Run containers:
 ```bash
 docker-compose up -d
 ```
 
 
 ___
+# Docker Glossary 📖
+
+- [Docker GLOSS.md](GLOSS.md)
+
 # References 📚
 
 - [Docker Docs](https://docs.docker.com/)

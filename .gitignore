@@ -33,3 +33,4 @@
 
 # Secrets
 **/.env
+**/secrets.txt
