@@ -23,7 +23,7 @@ RUN wget https://downloads.mariadb.com/MariaDB/mariadb_repo_setup && \
 
 # Copy custom Entrypoint bash script
 COPY ./tools/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN cmod +x /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Remove default mariadb configuration
 RUN rm /etc/mysql/mariadb.conf.d/50-server.cnf
