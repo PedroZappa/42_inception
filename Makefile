@@ -17,11 +17,6 @@
 MAKE	= make -C
 SHELL	:= bash --rcfile ~/.bashrc
 
-# Default test values
-# MODE			= debug
-IN_PATH		?= $(SRC_PATH)
-ARG				= "3 5 9 7 4"
-
 #==============================================================================#
 #                                     NAMES                                    #
 #==============================================================================#
@@ -57,12 +52,20 @@ MKDIR_P	= mkdir -p
 
 ##@  Rules 🏗
 
-all: setup
+all: setup ## Build project
 
 setup:
 	./setup.sh
 
 check_volumes: ## Check Docker Volumes
+	@echo "$(CYA)Checking Docker Volumes...$(D)"
+	@if [ ! -d $(HOME)/data/db ] || [ ! -d $(HOME)/data/wp ]; then \
+		echo " $(RED)$(D) [$(GRN)Creating Volumes!$(D)]"; \
+		echo "* $(YEL)Creating $(CYA)$(HOME)/data/db$(D) & $(CYA)$(HOME)/data/wp$(D) folders:$(D) $(_SUCCESS)"; \
+		$(MKDIR_P) $(HOME)/data/db $(HOME)/data/wp; \
+	else \
+		echo " $(RED)$(D) [$(GRN)Volumes are mounted!$(D)]"; \
+	fi
 
 
 ##@ Test Rules 🧪
