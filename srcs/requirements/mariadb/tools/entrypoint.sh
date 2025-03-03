@@ -92,7 +92,7 @@ SECRETS_ENC="/run/secrets/secrets.enc"
 
     # Shutdown MariaDB background process
     mysqladmin --socket="$SOCKET_FILE" -u root -p"$MYSQL_ROOT_PASSWORD" shutdown
-    echo "MariaDB shutdown successfully."
+    echo "MariaDB setup successfully."
 )
 
 # Start MariaDB in the foreground
