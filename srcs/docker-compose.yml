@@ -1,0 +1,8 @@
+services:
+  mariadb:
+    build: ./requirements/mariadb
+    container_name: mariadb
+    image: mariadb
+    expose:
+      - "3306"
+
