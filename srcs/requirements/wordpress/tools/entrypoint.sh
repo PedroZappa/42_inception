@@ -38,7 +38,6 @@ chmod 600 /run/secrets/secrets.txt
 	rm /run/secrets/secrets.txt
     echo "Removed secrets temporary file."
 
-
     # Download and configure wordpress
     if [ ! -f "wp-config.php" ]; then
         # Download & install wp-cli
@@ -56,7 +55,7 @@ chmod 600 /run/secrets/secrets.txt
         done
         echo "MariaDB is ready."
 
-        # Setp wp-config.php (search & replace)
+        # Setup wp-config.php (search & replace)
         cp wp-config-sample.php wp-config.php
 		sed -i "s/username_here/$MYSQL_USER/g" wp-config.php
 		sed -i "s/password_here/$MYSQL_PASSWORD/g" wp-config.php
@@ -65,11 +64,13 @@ chmod 600 /run/secrets/secrets.txt
 		sed -i "s/define( 'WP_DEBUG', false )/define( 'WP_DEBUG', true )/g" wp-config.php
 
         # Install WordPress 
-		wp core install --url="https://antoda-s.42.fr" --title="Inception" \
+        echo " Installing wordpress to url https://passunca.42.fr"
+		wp core install --url="https://passunca.42.fr" --title="Inception" \
             --admin_user=$WP_ADMIN --admin_password=$WP_ADMIN_PASSWORD \
             --admin_email=$WP_ADMIN_EMAIL --skip-email --allow-root
 
         # Create user
+        echo "Creating user $WP_USER..."
 		wp user create $WP_USER $WP_USER_EMAIL --role=author \
             --user_pass=$WP_USER_PASSWORD --allow-root \
             --path=/var/www/html/wordpress
@@ -86,4 +87,6 @@ chmod 600 /run/secrets/secrets.txt
 
 # Start PHP-FPM
 echo "Starting PHP-FPM..."
+# Configure PHP-FPM
+sed -i '/listen = /c\listen = 9000' /etc/php/7.4/fpm/pool.d/www.conf
 exec php-fpm7.4 -F

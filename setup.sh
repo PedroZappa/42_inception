@@ -80,7 +80,7 @@ CWD=$(pwd)
 # Secrets Path
 SECRETS_PATH=$HOME
 # Create the secrets file
-SECRETS_FILE=./secrets/secrets.txt
+SECRETS_FILE=./secrets/vault/secrets.txt
 create_secrets_file "$SECRETS_FILE"
 
 # Create the .env file
