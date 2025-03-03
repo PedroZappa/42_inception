@@ -32,7 +32,7 @@ COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d
 
 # Export Port and Volume
 EXPOSE 3306
-VOLUME ["/var/lib/mysql"]
+VOLUME [ "/var/lib/mysql" ]
 
 # Set Entrypoint
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
