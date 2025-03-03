@@ -85,7 +85,7 @@ services:
       on-failure:7
 
     expose:
-      - "9000"
+      - "9000:9000"
     networks:
       - inception
 

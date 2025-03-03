@@ -79,10 +79,27 @@ check_host:		## Check Docker Hosts
 		echo "* $(YEL)127.0.0.1$(D) $(USER).42.pt $(USER).42.fr"; \
 	fi
 
-up: setup
+up: setup ## Get Docker Networks up
 	@echo "$(CYA)Docker Compose $(GRN)UP$(D)..."
 	docker-compose -f $(DOCKER_PATH) up --build && \
 		trap "make stop" EXIT
+
+start: setup ## Start Docker Network
+	@echo "$(CYA)Docker Compose $(GRN)START$(D)..."
+	docker compose -f $(DOCKER_PATH) start
+
+stop: setup ## Stop Docker Network
+	@echo "$(CYA)Docker Compose $(GRN)STOP$(D)..."
+	docker compose -f $(DOCKER_PATH) stop
+
+rm: stop ## Remove Docker Network
+	@echo "$(CYA)Docker Compose $(GRN)RM$(D)..."
+	docker compose -f $(DOCKER_PATH) rm
+
+down: ## Bring down Docker Network
+	echo "$(CYA)Docker Compose $(GRN)DOWN$(D)..."
+	docker compose -f $(DOCKER_PATH) down
+
 
 ##@ Test Rules 🧪
 
@@ -92,8 +109,18 @@ up: setup
 
 ##@ Clean-up Rules 󰃢
 
+
+rmi: ## Remove Docker Network
+	echo "$(CYA)Docker Compose $(GRN)RMI$(D): remove container images..."
+	docker compose -f $(DOCKER_PATH) down --rmi all
+
+rmv: ## Remove Docker Volumes
+	echo "$(CYA)Docker Compose $(GRN)RMV$(D): remove volumes..."
+	docker compose -f $(DOCKER_PATH) down --volumes
+
 clean: 				## Remove object files
-	@echo "*** $(YEL)Removing $(MAG)$(NAME)$(D) and deps $(YEL)temporary files$(D)"
+	@echo "*** $(YEL)Removing $(MAG)$(NAME)$(D)$(YEL)temporary files$(D)"
+	@docker compose -f $(DOCKER_PATH) down --rmi all --volumes
 	@if [ -d "$(SECRETS_PATH)" ]; then \
 		if [ -d "$(SECRETS_PATH)" ]; then \
 			$(RM) $(SECRETS_PATH); \
@@ -103,6 +130,10 @@ clean: 				## Remove object files
 	else \
 		echo " $(RED)$(D) [$(GRN)Nothing to clean!$(D)]"; \
 	fi
+
+fclean: clean ## Remove All
+	@echo "*** $(YEL)Removing $(MAG)$(NAME)$(YEL) files$(D)"
+	sudo rm -fr ~/data
 
 re: fclean all	## Purge & Recompile
 
