@@ -28,7 +28,7 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # Remove default mariadb configuration
 RUN rm /etc/mysql/mariadb.conf.d/50-server.cnf
 # Move custom configuration into place
-COPY tools/50-server.cnf /etc/mysql/mariadb.conf.d
+COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d
 
 # Export Port and Volume
 EXPOSE 3306
