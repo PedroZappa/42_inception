@@ -36,6 +36,7 @@ _SEP	 			= ===================================================
 TEMP_PATH		= .temp
 SECRETS_PATH	= ./secrets
 DOCKER_PATH = ./srcs/docker-compose.yml
+DOCKER_BONUS_PATH = ./srcs/docker-compose_bonus.yml
 
 
 #==============================================================================#
@@ -70,6 +71,13 @@ check_volumes: ## Check Docker Volumes
 		echo "* $(YEL)$(HOME)/data/db$(D) & $(YEL)$(HOME)/data/wp$(D)"; \
 	fi
 
+check_volumes_bonus:
+	@echo "$(CYA)Checking Docker Volumes (Bonus)...$(D)"
+	@if [ ! -d "$HOME/data/backup" ] || [ ! -d "$HOME/data/ws" ]; then \
+		echo " $(RED)$(D) [$(GRN)Creating Volumes!$(D)]"; \
+		$(MKDIR_P) "$HOME/data/backup" "$HOME/data/ws"; \
+	fi
+
 check_host:		## Check Docker Hosts
 	@if ! grep -q '127.0.0.1 $(USER).42.pt $(USER).42.fr' /etc/hosts; then \
 		echo " $(RED)$(D) [$(GRN)Adding host entry!$(D)]"; \
@@ -99,6 +107,31 @@ rm: stop ## Remove Docker Network
 down: ## Bring down Docker Network
 	echo "$(CYA)Docker Compose $(GRN)DOWN$(D)..."
 	docker compose -f $(DOCKER_PATH) down
+
+## Bonus
+
+bonus: up_bonus
+
+up_bonus: check_host check_volumes check_volumes_bonus
+	@echo "$(CYA)Docker Compose Bonus $(GRN)UP$(D)..."
+	docker compose -f $(DOCKER_BONUS_PATH) up --build && \
+		trap "make bonus_stop" EXIT
+
+start_bonus: setup
+	@echo "$(CYA)Docker Compose Bonus $(GRN)START$(D)..."
+	docker compose -f $(DOCKER_BONUS_PATH) start
+
+stop_bonus: check_host check_volumes check_volumes_bonus
+	@echo "$(CYA)Docker Compose Bonus $(GRN)STOP$(D)..."
+	docker compose -f $(DOCKER_BONUS_PATH) stop
+
+rm_bonus: stop ## Remove Docker Network
+	@echo "$(CYA)Docker Compose $(GRN)RM$(D)..."
+	docker compose -f $(DOCKER_BONUS_PATH) rm
+
+down_bonus: ## Bring down Docker Network
+	echo "$(CYA)Docker Compose $(GRN)DOWN$(D)..."
+	docker compose -f $(DOCKER_BONUS_PATH) down
 
 
 ##@ Test Rules 🧪
@@ -151,6 +184,22 @@ fclean: clean ## Remove All
 
 re: fclean all	## Purge & Recompile
 
+
+rmi_bonus: ## Remove Docker Network
+	echo "$(CYA)Docker Compose $(GRN)RMI$(D): remove container images..."
+	docker compose -f $(DOCKER_BONUS_PATH) down --rmi all
+
+rmv_bonus: ## Remove Docker Volumes
+	echo "$(CYA)Docker Compose $(GRN)RMV$(D): remove volumes..."
+	docker compose -f $(DOCKER_BONUS_PATH) down --volumes
+
+clean_bonus: 
+	@echo "$(CYA)Docker Compose $(GRN)CLEAN$(D): remove unused images & volumes..."
+	docker compose -f $(DOCKER_BONUS_PATH) down --rmi all --volumes
+
+fclean_bonus: clean_bonus ## Prune Docker System
+	echo "$(CYA)Docker Compose $(GRN)FCLEAN$(D): prune system..."
+	sudo rm -fr ~/data
 ##@ Help 󰛵
 
 help: 			## Display this help page
@@ -160,6 +209,9 @@ help: 			## Display this help page
 			printf "\t$(GRN)%-18s$(D) %s\n", $$1, $$2 } \
 		/^##@/ { \
 			printf "\n=> %s\n", substr($$0, 5) } ' Makefile
+
+re_bonus: fclean_bonus up_bonus ## Purge & Recompile
+
 ## Tweaked from source:
 ### https://www.padok.fr/en/blog/beautiful-makefile-awk
 

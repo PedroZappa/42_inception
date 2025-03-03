@@ -1,0 +1,173 @@
+networks:
+  inception:            # The name of the network
+    name: inception     # Explicitly sets the network name
+    driver: bridge      # Uses the bridge network driver (default Docker network type)
+
+secrets:
+  secret_enc:                     # The name of the first secret
+    file: ~/secrets/secrets.enc   # Path to the encrypted secrets file on your host
+  secret_key:                                # The name of the second secret
+    file: ~/secrets/vault/decryptionKey.txt  # Path to the decryption key file
+
+volumes:
+  ### MariaDB
+  db_data:                  # The name of the volume
+    name: db_data           # Explicitly sets the volume name
+    driver: local           # Uses the local volume driver
+    driver_opts:            # Options for the driver
+      type: none            # Specifies a bind mount (not a volume with a filesystem)
+      device: ~/data/db     # The host path to mount (in your home directory)
+      o: bind               # Mount option specifying this is a bind mount
+  ### WordPress
+  wp_data:
+    name: wp_data
+    driver: local
+    driver_opts:
+      type: none
+      device: ~/data/wp
+      o: bind
+  ### Website
+  ws_data:
+    name: ws_data
+    driver: local
+    driver_opts:
+      type: none
+      device: ~/data/ws
+      o: bind
+  ### Rsync
+  rsync:
+    name: rsync
+    driver: local
+    driver_opts:
+      type: bind
+      device: ~/data/backup
+      o: bind
+
+services:
+  ### MariaDB
+  mariadb:                     # The service name
+    build: ./requirements/mariadb  # Path to the Dockerfile for building this service
+    container_name: mariadb    # Explicitly names the container (otherwise would be auto-generated)
+    image: mariadb:42          # The image name:tag to use (or create when building)
+
+    volumes:                   # Mounts storage to the container
+      - db_data:/var/lib/mysql  # Uses the named volume "db_data" for database storage
+      - ~/secrets/secrets.enc:/run/secrets/secrets.enc:ro  # Mounts host file as read-only
+
+    secrets:                   # Docker secrets to inject into the container
+      - secret_key             # Makes the "secret_key" available inside the container
+
+    env_file:                  # Environment variables file
+      - ~/secrets/.env         # Loads environment variables from this file
+
+    restart:                   # Container restart policy
+      on-failure:7             # Restart up to 5 times if container exits with non-zero code
+
+    expose:                    # Ports exposed only to other containers (not to host)
+      - "3306"                 # Standard MariaDB/MySQL port
+
+    networks:                  # Networks this container connects to
+      - inception              # Connects to the "inception" network defined elsewhere
+
+    healthcheck:               # Container health monitoring configuration
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]  # Command to check if DB is healthy
+      interval: 11s            # Run the check every 11 seconds
+      timeout: 7s              # Health check times out after 7 seconds
+      retries: 7               # Number of consecutive failures before marking unhealthy
+
+    logging:                   # Log handling configuration
+      driver: "json-file"      # Use JSON file format for logs
+      options:
+        max-file: "7"          # Keep up to 7 log files
+        max-size: "7m"        # Each log file can be up to 7 megabytes
+
+  ### WordPress
+  wordpress:
+    build: ./requirements/wordpress
+    container_name: wordpress
+    image: wordpress:42
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy   
+    volumes:
+      - wp_data:/var/www/html/wordpress
+      - ~/secrets/secrets.enc:/run/secrets/secrets.enc
+
+    secrets:
+      - secret_key
+    env_file:
+      - ~/secrets/.env
+    restart:
+      on-failure:7
+
+    expose:
+      - "9000:9000"
+    networks:
+      - inception
+
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "7"
+        max-size: "7m"
+
+  ### Website
+  website:
+    build: ./requirements/bonus/website
+    container_name: website
+    image: website:pz
+    volumes:
+      - ws_data:/var/www/html
+    networks:
+      - inception
+    restart: on-failure:7
+
+  ### Nginx
+  nginx:
+    build: ./requirements/nginx
+    container_name: nginx
+    image: nginx:42
+    depends_on:
+      - wordpress
+    volumes:
+      - wp_data:/var/www/html/wordpress
+
+    env_file:
+      - ~/secrets/.env
+    restart:
+      on-failure:7
+
+    ports:
+      - "443:443"
+    networks:
+      - inception
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "7m"
+        max-file: "7"
+
+  ### Redis
+  redis:
+    build: ./requirements/bonus/redis
+    container_name: redis
+    image: redis:pz
+
+    networks:
+      - inception
+    restart:
+      on-failure:7
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 11s
+      timeout: 7s
+      retries: 7
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "7"
+        max-size: "7m"
