@@ -34,3 +34,4 @@
 # Secrets
 **/.env
 **/secrets.txt
+**/decryptionKey.txt
