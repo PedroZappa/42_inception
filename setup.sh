@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # setup.sh - Creates environment files for Docker setup
 # Usage: ./setup.sh [username]
 
@@ -7,7 +6,10 @@
 USERNAME=${1:-"passunca"}
 
 # Create directories if they don't exist
-mkdir -p ~/secrets/vault
+mkdir -p ./secrets/vault
+# Create a dummy decryption key for the setup
+echo "456zedro123" > ./secrets/vault/decryptionKey.txt
+chmod 600 ./secrets/vault/decryptionKey.txt
 
 # Function to create the secrets file
 create_secrets_file() {
@@ -52,28 +54,56 @@ EOF
     echo "Created .env file: $env_file"
 }
 
+
+# Function to encrypt the secrets file
+encrypt_secrets() {
+    local input_file="$1"
+    local output_file="$2"
+    local key_file="$3"
+    
+    # Generate a random encryption key if not exists
+    if [ ! -f "$key_file" ]; then
+        openssl rand -base64 32 > "$key_file"
+        chmod 600 "$key_file"
+        echo "Generated new encryption key: $key_file"
+    fi
+    
+    # Encrypt the file
+    openssl enc -aes-256-cbc -salt -in "$input_file" -out "$output_file" -pass file:"$key_file"
+    
+    echo "Encrypted secrets file created: $output_file"
+}
+#
+# Capture the current working directory
+CWD=$(pwd)
+# Secrets Path
+SECRETS_PATH=$HOME
 # Create the secrets file
-SECRETS_FILE=~/secrets/secrets.txt
+SECRETS_FILE=./secrets/secrets.txt
 create_secrets_file "$SECRETS_FILE"
 
 # Create the .env file
-ENV_FILE=~/secrets/.env
+ENV_FILE=./secrets/.env
 create_env_file "$ENV_FILE" "$USERNAME"
 
-# Create a dummy decryption key for the setup
-echo "456zedro123" > ~/secrets/vault/decryptionKey.txt
+# Create the encrypted version
+ENCRYPTED_FILE=./secrets/secrets.enc
+KEY_FILE=./secrets/vault/decryptionKey.txt
+encrypt_secrets "$SECRETS_FILE" "$ENCRYPTED_FILE" "$KEY_FILE"
 
-# Optional: Encrypt the secrets file (uncomment if needed)
-# cp "$SECRETS_FILE" ~/secrets/secrets.enc
-# echo "Note: For production, you should properly encrypt the secrets file"
+# Only create symlink if it doesn’t exist
+[ -L "$SECRETS_PATH" ] || ln -s "$CWD/secrets" "$SECRETS_PATH"
+
 
 echo "Setup complete!"
 echo "Files created:"
-echo "  - $SECRETS_FILE"
+echo "  - $SECRETS_FILE (unencrypted - you should delete this after verification)"
+echo "  - $ENCRYPTED_FILE (encrypted secrets)"
 echo "  - $ENV_FILE"
-echo "  - ~/secrets/vault/decryptionKey.txt"
+echo "  - $KEY_FILE (keep this secure!)"
 echo ""
 echo "Next steps:"
 echo "1. Review and modify the generated files at ~/secrets/ as needed"
-echo "2. For production use, encrypt the secrets file"
-echo "3. Run your Docker Compose setup"
+echo "2. If you modify secrets.txt, run './setup.sh $USERNAME' again to re-encrypt"
+echo "3. Once verified, remove the unencrypted secrets file: rm $SECRETS_FILE"
+echo "4. Run your Docker Compose setup"

@@ -19,38 +19,73 @@ volumes:
       o: bind               # Mount option specifying this is a bind mount
 
 services:
+  ### MariaDB
   mariadb:                     # The service name
     build: ./requirements/mariadb  # Path to the Dockerfile for building this service
     container_name: mariadb    # Explicitly names the container (otherwise would be auto-generated)
     image: mariadb:42          # The image name:tag to use (or create when building)
-    
+
     volumes:                   # Mounts storage to the container
       - db_data:/var/lib/mysql  # Uses the named volume "db_data" for database storage
       - ~/secrets/secrets.enc:/run/secrets/secrets.enc:ro  # Mounts host file as read-only
-    
+
     secrets:                   # Docker secrets to inject into the container
       - secret_key             # Makes the "secret_key" available inside the container
-    
+
     env_file:                  # Environment variables file
       - ~/secrets/.env         # Loads environment variables from this file
-    
+
     restart:                   # Container restart policy
       on-failure:7             # Restart up to 5 times if container exits with non-zero code
-    
+
     expose:                    # Ports exposed only to other containers (not to host)
       - "3306"                 # Standard MariaDB/MySQL port
-    
+
     networks:                  # Networks this container connects to
       - inception              # Connects to the "inception" network defined elsewhere
-    
+
     healthcheck:               # Container health monitoring configuration
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]  # Command to check if DB is healthy
       interval: 11s            # Run the check every 11 seconds
       timeout: 7s              # Health check times out after 7 seconds
       retries: 7               # Number of consecutive failures before marking unhealthy
-    
+
     logging:                   # Log handling configuration
       driver: "json-file"      # Use JSON file format for logs
       options:
         max-file: "7"          # Keep up to 7 log files
         max-size: "7m"        # Each log file can be up to 7 megabytes
+
+  ### WordPress
+  wordpress:
+    build: ./requirements/wordpress
+    container_name: wordpress
+    image: wordpress:42
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+    volumes:
+      - wp_data:/var/www/html/wordpress
+      - ~/secrets/secrets.enc:/run/secrets/secrets.enc
+
+    secrets:
+      - secret_key
+
+    env_file:
+      - ~/secrets/.env
+
+    restart:
+      on-failure:7
+
+    expose:
+      - "9000"
+
+    networks:
+      - inception
+
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "7"
+        max-size: "7m"
