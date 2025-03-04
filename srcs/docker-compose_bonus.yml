@@ -42,6 +42,14 @@ volumes:
       type: none
       device: ~/data/ws
       o: bind
+  ### UnrealIRCd
+  irc_data:
+    name: irc_data
+    driver: local
+    driver_opts:
+      type: none
+      device: ~/data/irc
+      o: bind
 
 services:
   ### MariaDB
@@ -174,3 +182,32 @@ services:
       options:
         max-file: "7"
         max-size: "7m"
+
+  ### UnrealIRCd
+  unrealircd:
+    build: ./requirements/bonus/unrealircd
+    container_name: unrealircd
+    image: unrealircd:42
+    volumes:
+      - ~/data/unrealircd:/unrealircd:rw  # Mount a volume to store UnrealIRCd data and configuration
+      - ~/secrets/unrealircd.conf:/unrealircd/unrealircd.conf:ro  # Mount your UnrealIRCd config file (read-only)
+      - ~/secrets/unrealircd.pass:/unrealircd/unrealircd.pass:ro  # Mount any other secret files (passwords, etc.)
+    networks:
+      - inception
+    ports:
+      - "6660-6669:6660-6669"  # Expose IRC ports (adjust as needed)
+      - "7000:7000"  # WebSocket port for services that connect via WebSockets
+    restart: on-failure:7  # Automatically restart on failure
+    environment:
+      - IRCD_SECRET=secret_value  # Example environment variable for secrets
+
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "7"
+        max-size: "7m"
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "6660"]  # Check if UnrealIRCd is responding on port 6660
+      interval: 30s
+      timeout: 5s
+      retries: 3
