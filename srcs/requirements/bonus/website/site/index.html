@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Image</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+    }
+
+    img {
+      max-width: 90vw;
+      max-height: 90vh;
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    const images = [
+      "./img/bbln_black.png",
+      "./img/bbln_green.png",
+      "./img/bbln_grey.png",
+      "./img/bbln_purple.png",
+      "./img/bbln_red.png",
+      "./img/bbln_yellow.png",
+    ];
+    const randomImage = images[Math.floor(Math.random() * images.length)];
+
+    const imgElement = document.createElement("img");
+    imgElement.src = "site/img/" + randomImage; // Updated path to site/img/
+    imgElement.alt = "Random Image";
+    document.body.appendChild(imgElement);
+  </script>
+</body>
+
+</html>

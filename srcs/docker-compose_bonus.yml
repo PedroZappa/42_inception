@@ -118,7 +118,8 @@ services:
     container_name: website
     image: website:42
     volumes:
-      - ws_data:/var/www/html
+      - ws_data:/var/www/html/
+      - ./site:/site:ro
     networks:
       - inception
     restart: on-failure:7

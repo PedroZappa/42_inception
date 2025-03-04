@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 
-sudo chown -R $(whoami):$(whoami) ~/data/ws
-chmod -R 755 ~/data/ws
-mkdir -p $HOME/data/ws
+# Ensure the target directory exists
+mkdir -p /var/www/html
+mkdir -p ~/data/ws
 
-# Make sure HTML has current level of permissions
-chown -R www-data:www-data /var/www/html
+# If a bind-mounted website exists, overwrite default files
+if [ -d "../site/" ]; then
+    # cp -r /mnt/ws_data/* /var/www/html/
+    cp -r ../site/ /var/www/html/
+    chown -R www-data:www-data $HOME/data/ws
+    echo "✅ Custom website files injected:"
+else
+    echo "⚠️ Using default website from build"
+fi
 
 # Start Nginx
 exec "$@"
