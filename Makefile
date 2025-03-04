@@ -89,8 +89,7 @@ check_host:		## Check Docker Hosts
 
 up: setup ## Get Docker Networks up
 	@echo "$(CYA)Docker Compose $(GRN)UP$(D)..."
-	docker-compose -f $(DOCKER_PATH) up --build && \
-		trap "make stop" EXIT
+	docker-compose -f $(DOCKER_PATH) up --build
 
 start: setup ## Start Docker Network
 	@echo "$(CYA)Docker Compose $(GRN)START$(D)..."
@@ -114,8 +113,7 @@ bonus: up_bonus
 
 up_bonus: check_host check_volumes check_volumes_bonus
 	@echo "$(CYA)Docker Compose Bonus $(GRN)UP$(D)..."
-	docker compose -f $(DOCKER_BONUS_PATH) up --build && \
-		trap "make bonus_stop" EXIT
+	docker compose -f $(DOCKER_BONUS_PATH) up --build
 
 start_bonus: setup
 	@echo "$(CYA)Docker Compose Bonus $(GRN)START$(D)..."

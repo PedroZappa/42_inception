@@ -26,14 +26,6 @@ volumes:
       type: none
       device: ~/data/wp
       o: bind
-  ### Website
-  ws_data:
-    name: ws_data
-    driver: local
-    driver_opts:
-      type: none
-      device: ~/data/ws
-      o: bind
   ### Rsync
   rsync:
     name: rsync
@@ -41,6 +33,14 @@ volumes:
     driver_opts:
       type: bind
       device: ~/data/backup
+      o: bind
+  ### Website
+  ws_data:
+    name: ws_data
+    driver: local
+    driver_opts:
+      type: none
+      device: ~/data/ws
       o: bind
 
 services:
@@ -56,7 +56,6 @@ services:
 
     secrets:                   # Docker secrets to inject into the container
       - secret_key             # Makes the "secret_key" available inside the container
-
     env_file:                  # Environment variables file
       - ~/secrets/.env         # Loads environment variables from this file
 
@@ -117,7 +116,7 @@ services:
   website:
     build: ./requirements/bonus/website
     container_name: website
-    image: website:pz
+    image: website:42
     volumes:
       - ws_data:/var/www/html
     networks:
@@ -131,6 +130,7 @@ services:
     image: nginx:42
     depends_on:
       - wordpress
+      - website
     volumes:
       - wp_data:/var/www/html/wordpress
       - ws_data:/var/www/html/website
@@ -142,6 +142,7 @@ services:
 
     ports:
       - "443:443"
+      - "80:80"
     networks:
       - inception
 
@@ -155,7 +156,7 @@ services:
   redis:
     build: ./requirements/bonus/redis
     container_name: redis
-    image: redis:pz
+    image: redis:42
 
     networks:
       - inception

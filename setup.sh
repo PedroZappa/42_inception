@@ -7,6 +7,9 @@ USERNAME=${1:-"passunca"}
 
 # Create directories if they don't exist
 mkdir -p ./secrets/vault
+mkdir -p ~/data/ws
+mkdir -p ~/data/wp
+mkdir -p ~/data/db
 # Create a dummy decryption key for the setup
 echo "456zedro123" > ./secrets/vault/decryptionKey.txt
 chmod 600 ./secrets/vault/decryptionKey.txt
