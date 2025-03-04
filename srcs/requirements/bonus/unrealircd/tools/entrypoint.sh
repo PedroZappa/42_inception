@@ -3,4 +3,3 @@
 # Start UnrealIRCd
 cd /unrealircd-${UNREALIRCD_VERSION}
 ./unrealircd
-

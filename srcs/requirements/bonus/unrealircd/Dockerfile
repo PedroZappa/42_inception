@@ -37,17 +37,20 @@ RUN chmod +x ./Config && \
     ./Config && \
     make
 
-# Switch back to root to complete installation and final setup
-# USER root
-
 # Install UnrealIRCd
-RUN cd /unrealircd-${UNREALIRCD_VERSION}
-RUN make
 RUN make install
-RUN cp ./conf/unrealircd.conf /conf/unrealircd.conf
+
+# Correct the cp command with absolute paths
+COPY ./conf/unrealircd.conf /unrealircd/conf/unrealircd.conf
+# RUN cp ./conf/unrealircd.conf ~/unrealircd/conf/unrealircd.conf
 
 # Expose IRC ports
 EXPOSE 6660-6669 7000
+
+WORKDIR /
+# Switch back to root to complete installation and final setup
+USER root
+
 
 # Copy custom Entrypoint bash script
 COPY ./tools/entrypoint.sh /entrypoint.sh
