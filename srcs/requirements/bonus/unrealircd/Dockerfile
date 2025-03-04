@@ -44,11 +44,14 @@ RUN make install
 RUN mkdir -p /home/unrealircd_user/unrealircd/conf/tls
 
 # Generate SSL certificate and private key (Self-Signed)
+# Generate private key
 RUN openssl genpkey -algorithm RSA -out /home/unrealircd_user/unrealircd/conf/tls/server.key.pem \
       -pkeyopt rsa_keygen_bits:2048 && \
+    # Generate certificate signing request (CSR)
     openssl req -new -key /home/unrealircd_user/unrealircd/conf/tls/server.key.pem \
       -out /home/unrealircd_user/unrealircd/conf/tls/server.csr \
-      -subj "/C=US/ST=State/L=City/O=Organization/OU=IT/CN=localhost" && \
+      -subj "/C=PT/ST=Porto/L=Porto/O=ZedroCorp/OU=IT/CN=localhost" && \
+    # Generate self-signed certificate
     openssl x509 -req -in /home/unrealircd_user/unrealircd/conf/tls/server.csr \
       -signkey /home/unrealircd_user/unrealircd/conf/tls/server.key.pem \
       -out /home/unrealircd_user/unrealircd/conf/tls/server.cert.pem -days 365 && \
