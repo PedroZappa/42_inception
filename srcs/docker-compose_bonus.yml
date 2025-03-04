@@ -172,6 +172,9 @@ services:
     restart:
       on-failure:7
 
+    ports:
+      - "6379:6379"
+
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 11s
@@ -190,16 +193,19 @@ services:
     image: unrealircd:42
     volumes:
       - ~/data/unrealircd:/unrealircd:rw  # Mount a volume to store UnrealIRCd data and configuration
-      - ~/secrets/unrealircd.conf:/unrealircd/unrealircd.conf:ro  # Mount your UnrealIRCd config file (read-only)
-      - ~/secrets/unrealircd.pass:/unrealircd/unrealircd.pass:ro  # Mount any other secret files (passwords, etc.)
+      - ~/secrets/secrets.enc:/run/secrets/secrets.enc:ro  # Mounts host file as read-only
+
+    secrets:
+      - secret_key
+    env_file:
+      - ~/secrets/.env
+
     networks:
       - inception
     ports:
-      - "6660-6669:6660-6669"  # Expose IRC ports (adjust as needed)
+      - "6660-6669:6660-6669"  # Expose IRC ports
       - "7000:7000"  # WebSocket port for services that connect via WebSockets
     restart: on-failure:7  # Automatically restart on failure
-    environment:
-      - IRCD_SECRET=secret_value  # Example environment variable for secrets
 
     logging:
       driver: "json-file"

@@ -49,7 +49,7 @@ chmod 600 /run/secrets/secrets.txt
 
         # Wait for MariaDB
         echo "Waiting for MariaDB to be ready..."
-		until mysql -h"${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SELECT 1;" > /dev/null 2>&1; do
+		    until mysql -h"${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SELECT 1;" > /dev/null 2>&1; do
             echo "MariaDB is not ready yet. Retrying..."
             sleep 1
         done
@@ -57,21 +57,21 @@ chmod 600 /run/secrets/secrets.txt
 
         # Setup wp-config.php (search & replace)
         cp wp-config-sample.php wp-config.php
-		sed -i "s/username_here/$MYSQL_USER/g" wp-config.php
-		sed -i "s/password_here/$MYSQL_PASSWORD/g" wp-config.php
-		sed -i "s/localhost/$MYSQL_HOST/g" wp-config.php
-		sed -i "s/database_name_here/$MYSQL_DATABASE/g" wp-config.php
-		sed -i "s/define( 'WP_DEBUG', false )/define( 'WP_DEBUG', true )/g" wp-config.php
+        sed -i "s/username_here/$MYSQL_USER/g" wp-config.php
+        sed -i "s/password_here/$MYSQL_PASSWORD/g" wp-config.php
+        sed -i "s/localhost/$MYSQL_HOST/g" wp-config.php
+        sed -i "s/database_name_here/$MYSQL_DATABASE/g" wp-config.php
+        sed -i "s/define( 'WP_DEBUG', false )/define( 'WP_DEBUG', true )/g" wp-config.php
 
         # Install WordPress 
         echo " Installing wordpress to url https://passunca.42.fr"
-		wp core install --url="https://passunca.42.fr" --title="Inception" \
+        wp core install --url="https://passunca.42.fr" --title="Inception" \
             --admin_user=$WP_ADMIN --admin_password=$WP_ADMIN_PASSWORD \
             --admin_email=$WP_ADMIN_EMAIL --skip-email --allow-root
 
         # Create user
         echo "Creating user $WP_USER..."
-		wp user create $WP_USER $WP_USER_EMAIL --role=author \
+        wp user create $WP_USER $WP_USER_EMAIL --role=author \
             --user_pass=$WP_USER_PASSWORD --allow-root \
             --path=/var/www/html/wordpress
     fi

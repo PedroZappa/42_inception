@@ -66,6 +66,8 @@ chmod 600 /run/secrets/secrets.txt
 		sed -i "/\/\* That's all, stop editing! Happy publishing. \*\//i define('WP_REDIS_HOST', 'redis');" wp-config.php
 		sed -i "/\/\* That's all, stop editing! Happy publishing. \*\//i define('WP_REDIS_PORT', 6379);" wp-config.php
 		sed -i "/\/\* That's all, stop editing! Happy publishing. \*\//i define('WP_REDIS_DATABASE', 0);" wp-config.php
+		sed -i "/\/\* That's all, stop editing! Happy publishing. \*\//i define('WP_REDIS_TIMEOUT', 1);" wp-config.php
+		sed -i "/\/\* That's all, stop editing! Happy publishing. \*\//i define('WP_REDIS_READ_TIMEOUT', 1);" wp-config.php
 		sed -i "/\/\* That's all, stop editing! Happy publishing. \*\//i define('WP_CACHE', true);" wp-config.php
 
         # Install WordPress 

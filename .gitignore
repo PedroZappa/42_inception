@@ -36,3 +36,4 @@
 **/secrets.txt
 **/secrets.enc
 **/decryptionKey.txt
+**/tls
