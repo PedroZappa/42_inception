@@ -18,7 +18,7 @@ ENV_FILE="$SECRETS_DIR/.env"
 
 # Create necessary directories
 mkdir -p "$VAULT_DIR" "$TLS_DIR"
-mkdir -p ~/data/ws ~/data/wp ~/data/db
+mkdir -p ~/data/ws ~/data/wp ~/data/db ~/data/unrealircd ~/data/doom
 
 # Generate a dummy decryption key if it does not exist
 if [[ ! -f "$KEY_FILE" ]]; then

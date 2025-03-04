@@ -236,7 +236,7 @@ services:
     container_name: doom
     image: doom:42
     volumes:
-      - doom_data:/data/doom
+      - doom_data:/data/doom:rw
     networks:
       - inception
     ports:
