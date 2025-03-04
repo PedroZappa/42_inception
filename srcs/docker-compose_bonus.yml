@@ -26,14 +26,6 @@ volumes:
       type: none
       device: ~/data/wp
       o: bind
-  ### Rsync
-  rsync:
-    name: rsync
-    driver: local
-    driver_opts:
-      type: bind
-      device: ~/data/backup
-      o: bind
   ### Website
   ws_data:
     name: ws_data
@@ -185,7 +177,18 @@ services:
       options:
         max-file: "7"
         max-size: "7m"
+  ### Adminer
+  adminer:
+    build: requirements/bonus/adminer
+    container_name: adminer
+    image: adminer:42
 
+    ports: 
+      - target: 8080
+    networks:
+      - inception
+    restart: on-failure:7
+    mem_limit: 256M
   ### UnrealIRCd
   unrealircd:
     build: ./requirements/bonus/unrealircd
