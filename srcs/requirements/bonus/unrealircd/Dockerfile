@@ -15,10 +15,8 @@ RUN apt-get update && apt upgrade -y && \
   sudo automake libtool && \
   rm -rf /var/lib/apt/lists/*
 
-# Set the UnrealIRCd version
-ENV UNREALIRCD_VERSION 6.1.0
-
 # Download and extract UnrealIRCd
+ENV UNREALIRCD_VERSION 6.1.0
 RUN wget https://www.unrealircd.org/downloads/unrealircd-${UNREALIRCD_VERSION}.tar.gz && \
     tar xzvf unrealircd-${UNREALIRCD_VERSION}.tar.gz && \
     rm unrealircd-${UNREALIRCD_VERSION}.tar.gz

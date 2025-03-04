@@ -42,6 +42,14 @@ volumes:
       type: none
       device: ~/data/irc
       o: bind
+  ### Doom
+  doom_data:
+    name: doom_data
+    driver: local
+    driver_opts:
+      type: none
+      device: ~/data/doom
+      o: bind
 
 services:
   ### MariaDB
@@ -189,6 +197,7 @@ services:
       - inception
     restart: on-failure:7
     mem_limit: 256M
+    
   ### UnrealIRCd
   unrealircd:
     build: ./requirements/bonus/unrealircd
@@ -220,3 +229,15 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+
+  ### terminal-doom
+  doom:
+    build: ./requirements/bonus/doom
+    container_name: doom
+    image: doom:42
+    volumes:
+      - doom_data:/data/doom
+    networks:
+      - inception
+    ports:
+      - "3333:3333"
