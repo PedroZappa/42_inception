@@ -32,7 +32,7 @@ RUN wget https://ziglang.org/download/${ZIG_VERSION}/zig-linux-x86_64-${ZIG_VERS
 
 
 # Get Doom
-RUN git clone https://github.com/cryptocode/terminal-doom.git
+RUN git clone https://github.com/cryptocode/terminal-doom.git /terminal-doom
 
 # Build Doom
 WORKDIR /terminal-doom
@@ -46,5 +46,5 @@ COPY ./tools/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
   
 # Set entrypoint
-ENTRYPOINT ["sh", "/entrypoint.sh"]
+ENTRYPOINT [ "/entrypoint.sh" ]
 

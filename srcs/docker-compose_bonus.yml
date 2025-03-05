@@ -244,3 +244,6 @@ services:
       - inception
     ports:
       - "3333:3333"
+    stdin_open: true  # Keep STDIN open
+    tty: true         # Allocate a pseudo-TTY
+    restart: unless-stopped  # Restart policy to keep container running
