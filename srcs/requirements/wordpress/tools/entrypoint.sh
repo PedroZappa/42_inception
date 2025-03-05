@@ -82,9 +82,9 @@ chmod 600 /run/secrets/secrets.txt
     find /var/www/html/wordpress/wp-content -type f -exec chmod 777 {} \;
 
     echo "Permissions set for Wordpress."
-    echo "Get to a static site here : https://passunca.42.pt"
     echo "Get to a WordPress site here : https://passunca.42.fr"
     echo "Get to WordPress Admin Dashboard here : https://passunca.42.fr/wp-admin"
+    echo "Get to a (bonus) static site here : https://passunca.42.pt"
 )
 
 # Start PHP-FPM
@@ -92,3 +92,4 @@ echo "Starting PHP-FPM..."
 # Configure PHP-FPM
 sed -i '/listen = /c\listen = 9000' /etc/php/7.4/fpm/pool.d/www.conf
 exec php-fpm7.4 -F
+echo "PHP-FPM started."

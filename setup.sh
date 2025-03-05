@@ -21,11 +21,11 @@ echo "Created symlink: ./secrets -> $SECRETS_DIR"
 
 # Create necessary directories
 # Ensure the secrets directory exists and has correct permissions
-sudo mkdir -p "$SECRETS_DIR"
-sudo chmod 700 "$SECRETS_DIR"
+mkdir -p "$SECRETS_DIR"
+chmod 700 "$SECRETS_DIR"
 # Create necessary directories
-sudo mkdir -p "$TLS_DIR"
-sudo mkdir -p ~/data/ws ~/data/wp ~/data/db ~/data/unrealircd ~/data/doom
+mkdir -p "$TLS_DIR"
+mkdir -p ~/data/ws ~/data/wp ~/data/db ~/data/unrealircd ~/data/doom
 echo "Directories created successfully!"
 
 # Generate a dummy decryption key if it does not exist
@@ -46,7 +46,7 @@ wp_user_password=wpupassword
 wp_user_email=pedrogzappa@gmail.com
 ftp_password=ftppassword
 EOF
-    sudo chmod 600 "$SECRETS_FILE"
+    chmod 600 "$SECRETS_FILE"
     echo "Created secrets file: $SECRETS_FILE"
 }
 
@@ -71,28 +71,29 @@ FTP_USER=ftpuser
 URICD_ADMIN=uricdadmin
 URICD_USER=uricduser
 EOF
-    sudo chmod 600 "$ENV_FILE"
+    chmod 600 "$ENV_FILE"
     echo "Created .env file: $ENV_FILE"
 }
 
 # Function to encrypt the secrets file
 encrypt_secrets() {
     # Encrypt the file
-    sudo openssl enc -aes-256-cbc -pbkdf2 -iter 100000 -salt \
+    openssl enc -aes-256-cbc -pbkdf2 -iter 100000 -salt \
       -in "$SECRETS_FILE" \
       -out "$ENCRYPTED_FILE" \
       -pass file:"$KEY_FILE"
-    sudo chmod 600 "$ENCRYPTED_FILE"
+    chmod 600 "$ENCRYPTED_FILE"
     echo "Encrypted secrets file: $ENCRYPTED_FILE"
 }
 
 # Function to generate TLS certificates (only if missing)
 generate_certificates() {
     if [[ ! -f "$TLS_DIR/server.cert.pem" || ! -f "$TLS_DIR/server.key.pem" ]]; then
-        sudo openssl req -x509 -newkey rsa:4096 -keyout "$TLS_DIR/server.key.pem" \
+        openssl req -x509 -newkey rsa:4096 -keyout "$TLS_DIR/server.key.pem" \
             -out "$TLS_DIR/server.cert.pem" -days 365 -nodes \
-            -subj "/CN=localhost"
-        sudo chmod 600 "$TLS_DIR/server.key.pem" "$TLS_DIR/server.cert.pem"
+            -subj "/C=PT/ST=Porto/L=Porto/O=ZedroCorp/OU=IT/CN=172.18.0.7"  # Change CN to match your server
+            # -subj "/CN=localhost"
+        chmod 600 "$TLS_DIR/server.key.pem" "$TLS_DIR/server.cert.pem"
         echo "Generated new TLS certificates."
     else
         echo "TLS certificates already exist. Skipping generation."

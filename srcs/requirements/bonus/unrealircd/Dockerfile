@@ -12,7 +12,7 @@ RUN useradd -m unrealircd_user
 RUN apt-get update && apt upgrade -y && \
   apt-get install -y build-essential pkg-config gdb libssl-dev libpcre2-dev \
   libargon2-0-dev libsodium-dev libc-ares-dev libcurl4-openssl-dev wget \
-  sudo automake libtool && \
+  sudo automake libtool net-tools && \
   rm -rf /var/lib/apt/lists/*
 
 # Download and extract UnrealIRCd
@@ -48,7 +48,7 @@ RUN openssl genpkey -algorithm RSA -out /home/unrealircd_user/unrealircd/conf/tl
     # Generate certificate signing request (CSR)
     openssl req -new -key /home/unrealircd_user/unrealircd/conf/tls/server.key.pem \
       -out /home/unrealircd_user/unrealircd/conf/tls/server.csr \
-      -subj "/C=PT/ST=Porto/L=Porto/O=ZedroCorp/OU=IT/CN=localhost" && \
+      -subj "/C=${CERT_COUNTRY}/ST=${CERT_STATE}/L=${CERT_LOCALITY}/O=${CERT_ORG}/OU=${CERT_ORG_UNIT}/CN=localhost" && \
     # Generate self-signed certificate
     openssl x509 -req -in /home/unrealircd_user/unrealircd/conf/tls/server.csr \
       -signkey /home/unrealircd_user/unrealircd/conf/tls/server.key.pem \
@@ -71,4 +71,4 @@ RUN chmod +x /entrypoint.sh
 USER unrealircd_user
   
 # Set entrypoint
-ENTRYPOINT ["sh", "/entrypoint.sh"]
+ENTRYPOINT ["sh", "-c", "/entrypoint.sh && tail -f /dev/null"]

@@ -206,7 +206,7 @@ services:
     image: unrealircd:42
     volumes:
       - ~/data/unrealircd:/unrealircd:rw  # Mount a volume to store UnrealIRCd data and configuration
-      - ~/secrets/secrets.enc:/run/secrets/secrets.enc:ro  # Mounts host file as read-only
+      - ~/secrets/vault/secrets.enc:/run/secrets/secrets.enc:ro  # Mounts host file as read-only
 
     secrets:
       - secret_key
@@ -217,6 +217,7 @@ services:
       - inception
     ports:
       - "6660-6669:6660-6669" # Expose IRC ports
+      - "6900:6900"
       - "6697:6697"  # Explicitly map TLS port
       - "6667:6667"  # Explicitly map non-TLS port
       - "7000:7000"  # WebSocket port for services that connect via WebSockets
@@ -247,3 +248,4 @@ services:
     stdin_open: true  # Keep STDIN open
     tty: true         # Allocate a pseudo-TTY
     restart: unless-stopped  # Restart policy to keep container running
+    command: [ "${HOME}/unrealircd/unrealircd", "start" ]
