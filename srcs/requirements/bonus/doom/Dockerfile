@@ -7,7 +7,7 @@ FROM debian:bullseye
 # Install Dependencies
 RUN apt-get update && apt upgrade -y && \
   apt-get install -y git gcc g++ clang curl wget xz-utils cmake make \
-  lsb-release software-properties-common gnupg ca-certificates && \
+  lsb-release software-properties-common gnupg ca-certificates netcat && \
   rm -rf /var/lib/apt/lists/*
 
 # Add LLVM repository for newer versions
@@ -43,7 +43,9 @@ EXPOSE 3333
 
 # Copy custom Entrypoint bash script
 COPY ./tools/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN chmod +x /entrypoint.sh && \
+    # Ensure CRLF issues are resolved
+    sed -i 's/\r$//' /entrypoint.sh
   
 # Set entrypoint
 ENTRYPOINT [ "/entrypoint.sh" ]

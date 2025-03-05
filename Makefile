@@ -134,6 +134,31 @@ down_bonus: ## Bring down Docker Network
 
 ##@ Test Rules 🧪
 
+doom:
+	@if command -v ghostty >/dev/null 2>&1; then \
+		ghostty -e docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom; \
+	elif command -v x-terminal-emulator >/dev/null 2>&1; then \
+		x-terminal-emulator -e docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom; \
+	elif command -v gnome-terminal >/dev/null 2>&1; then \
+		gnome-terminal -- docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom; \
+	elif command -v konsole >/dev/null 2>&1; then \
+		konsole -e docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom; \
+	elif command -v xfce4-terminal >/dev/null 2>&1; then \
+		xfce4-terminal -e "docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom"; \
+	elif command -v mate-terminal >/dev/null 2>&1; then \
+		mate-terminal -e "docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom"; \
+	elif command -v terminator >/dev/null 2>&1; then \
+		terminator -e "docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom"; \
+	elif command -v kitty >/dev/null 2>&1; then \
+		kitty docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom; \
+	elif command -v alacritty >/dev/null 2>&1; then \
+		alacritty -e docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom; \
+	elif [[ "$OSTYPE" == "darwin"* ]]; then \
+		open -a Terminal "docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom"; \
+	else \
+		echo "No supported terminal emulator found. Please open a terminal manually and run:"; \
+		echo "docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom"; \
+	fi
 
 ##@ Debug Rules 
 
