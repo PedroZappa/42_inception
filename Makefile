@@ -134,6 +134,20 @@ down_bonus: ## Bring down Docker Network
 
 ##@ Test Rules 🧪
 
+weechat: ## Run Weechat container
+	docker stop weechat || true
+	docker rm weechat || true
+	docker run \
+    --rm \
+    --interactive \
+    --tty \
+    --name weechat \
+    --user $(id -u):$(id -g) \
+    --volume /etc/localtime:/etc/localtime:ro \
+    --env TZ=Europe/Paris \
+		--publish 8000:8000 \
+    j33r/weechat:latest
+
 doom:
 	@if command -v ghostty >/dev/null 2>&1; then \
 		ghostty -e docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom; \

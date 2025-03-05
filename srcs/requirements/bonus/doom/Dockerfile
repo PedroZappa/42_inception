@@ -10,18 +10,6 @@ RUN apt-get update && apt upgrade -y && \
   lsb-release software-properties-common gnupg ca-certificates netcat && \
   rm -rf /var/lib/apt/lists/*
 
-# Add LLVM repository for newer versions
-# Set LLVM 19 as default
-# ENV LLVM_VERSION=19
-# RUN wget https://apt.llvm.org/llvm.sh && \
-#     chmod +x llvm.sh && \
-#     ./llvm.sh ${LLVM_VERSION} && \
-#     rm llvm.sh
-
-ENV CC=clang-${LLVM_VERSION}
-ENV CXX=clang++-${LLVM_VERSION}
-ENV LLVM_CONFIG=/usr/bin/llvm-config-${LLVM_VERSION}
-
 # Install Zig
 ARG ZIG_VERSION=0.12.0
 RUN wget https://ziglang.org/download/${ZIG_VERSION}/zig-linux-x86_64-${ZIG_VERSION}.tar.xz \
