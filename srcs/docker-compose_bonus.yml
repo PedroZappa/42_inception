@@ -216,7 +216,9 @@ services:
     networks:
       - inception
     ports:
-      - "6660-6669:6660-6669"  # Expose IRC ports
+      - "6660-6669:6660-6669" # Expose IRC ports
+      - "6697:6697"  # Explicitly map TLS port
+      - "6667:6667"  # Explicitly map non-TLS port
       - "7000:7000"  # WebSocket port for services that connect via WebSockets
     restart: on-failure:7  # Automatically restart on failure
 
