@@ -5,7 +5,7 @@ networks:
 
 secrets:
   secret_enc:                     # The name of the first secret
-    file: ~/secrets/secrets.enc   # Path to the encrypted secrets file on your host
+    file: ~/secrets/vault/secrets.enc   # Path to the encrypted secrets file on your host
   secret_key:                                # The name of the second secret
     file: ~/secrets/vault/decryptionKey.txt  # Path to the decryption key file
 
@@ -60,10 +60,11 @@ services:
 
     volumes:                   # Mounts storage to the container
       - db_data:/var/lib/mysql  # Uses the named volume "db_data" for database storage
-      - ~/secrets/secrets.enc:/run/secrets/secrets.enc:ro  # Mounts host file as read-only
+      - ~/secrets/vault/secrets.enc:/run/secrets/secrets.enc:ro  # Mounts host file as read-onlyVAULT/
 
     secrets:                   # Docker secrets to inject into the container
       - secret_key             # Makes the "secret_key" available inside the container
+      - secret_enc             # Makes the "secret_key" available inside the container
     env_file:                  # Environment variables file
       - ~/secrets/.env         # Loads environment variables from this file
 
@@ -100,7 +101,7 @@ services:
         condition: service_healthy   
     volumes:
       - wp_data:/var/www/html/wordpress
-      - ~/secrets/secrets.enc:/run/secrets/secrets.enc
+      - ~/secrets/vault/secrets.enc:/run/secrets/secrets.enc
 
     secrets:
       - secret_key

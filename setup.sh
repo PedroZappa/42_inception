@@ -9,16 +9,24 @@ USERNAME=${1:-"passunca"}
 
 # Define paths
 SECRETS_DIR="$HOME/secrets"
-VAULT_DIR="$SECRETS_DIR/vault"
+ENV_FILE="$SECRETS_DIR/.env"
 TLS_DIR="$SECRETS_DIR/tls"
+VAULT_DIR="$SECRETS_DIR/vault"
 SECRETS_FILE="$VAULT_DIR/secrets.txt"
 ENCRYPTED_FILE="$VAULT_DIR/secrets.enc"
 KEY_FILE="$VAULT_DIR/decryptionKey.txt"
-ENV_FILE="$SECRETS_DIR/.env"
+
+ln -sfn "$SECRETS_DIR" ./secrets
+echo "Created symlink: ./secrets -> $SECRETS_DIR"
 
 # Create necessary directories
-mkdir -p "$VAULT_DIR" "$TLS_DIR"
-mkdir -p ~/data/ws ~/data/wp ~/data/db ~/data/unrealircd ~/data/doom
+# Ensure the secrets directory exists and has correct permissions
+sudo mkdir -p "$SECRETS_DIR"
+sudo chmod 700 "$SECRETS_DIR"
+# Create necessary directories
+sudo mkdir -p "$TLS_DIR"
+sudo mkdir -p ~/data/ws ~/data/wp ~/data/db ~/data/unrealircd ~/data/doom
+echo "Directories created successfully!"
 
 # Generate a dummy decryption key if it does not exist
 if [[ ! -f "$KEY_FILE" ]]; then
@@ -38,6 +46,7 @@ wp_user_password=wpupassword
 wp_user_email=pedrogzappa@gmail.com
 ftp_password=ftppassword
 EOF
+    sudo chmod 600 "$SECRETS_FILE"
     echo "Created secrets file: $SECRETS_FILE"
 }
 
@@ -62,24 +71,28 @@ FTP_USER=ftpuser
 URICD_ADMIN=uricdadmin
 URICD_USER=uricduser
 EOF
+    sudo chmod 600 "$ENV_FILE"
     echo "Created .env file: $ENV_FILE"
 }
 
 # Function to encrypt the secrets file
 encrypt_secrets() {
     # Encrypt the file
-    openssl enc -aes-256-cbc -pbkdf2 -iter 100000 -salt -in "$SECRETS_FILE" -out "$ENCRYPTED_FILE" \
-        -pass file:"$KEY_FILE"
+    sudo openssl enc -aes-256-cbc -pbkdf2 -iter 100000 -salt \
+      -in "$SECRETS_FILE" \
+      -out "$ENCRYPTED_FILE" \
+      -pass file:"$KEY_FILE"
+    sudo chmod 600 "$ENCRYPTED_FILE"
     echo "Encrypted secrets file: $ENCRYPTED_FILE"
 }
 
 # Function to generate TLS certificates (only if missing)
 generate_certificates() {
     if [[ ! -f "$TLS_DIR/server.cert.pem" || ! -f "$TLS_DIR/server.key.pem" ]]; then
-        openssl req -x509 -newkey rsa:4096 -keyout "$TLS_DIR/server.key.pem" \
+        sudo openssl req -x509 -newkey rsa:4096 -keyout "$TLS_DIR/server.key.pem" \
             -out "$TLS_DIR/server.cert.pem" -days 365 -nodes \
             -subj "/CN=localhost"
-        chmod 600 "$TLS_DIR/server.key.pem" "$TLS_DIR/server.cert.pem"
+        sudo chmod 600 "$TLS_DIR/server.key.pem" "$TLS_DIR/server.cert.pem"
         echo "Generated new TLS certificates."
     else
         echo "TLS certificates already exist. Skipping generation."
@@ -103,5 +116,5 @@ echo ""
 echo "Next steps:"
 echo "1. Review and modify the generated files in $SECRETS_DIR as needed"
 echo "2. If you modify secrets.txt, run './setup.sh $USERNAME' again to re-encrypt"
-echo "3. Once verified, remove the unencrypted secrets file: rm $SECRETS_FILE"
+echo "3. Once verified, remove the unencrypted secrets file: sudo rm $SECRETS_FILE"
 echo "4. Run your Docker Compose setup"

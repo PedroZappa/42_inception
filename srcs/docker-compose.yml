@@ -36,7 +36,7 @@ services:
 
     volumes:                   # Mounts storage to the container
       - db_data:/var/lib/mysql  # Uses the named volume "db_data" for database storage
-      - ~/secrets/secrets.enc:/run/secrets/secrets.enc:ro  # Mounts host file as read-only
+      - ~/secrets/vault/secrets.enc:/run/secrets/secrets.enc:ro  # Mounts host file as read-onlyVAULT/
 
     secrets:                   # Docker secrets to inject into the container
       - secret_key             # Makes the "secret_key" available inside the container
@@ -75,7 +75,7 @@ services:
         condition: service_healthy
     volumes:
       - wp_data:/var/www/html/wordpress
-      - ~/secrets/secrets.enc:/run/secrets/secrets.enc
+      - ~/secrets/vault/secrets.enc:/run/secrets/secrets.enc
 
     secrets:
       - secret_key

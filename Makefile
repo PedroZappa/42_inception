@@ -111,7 +111,7 @@ down: ## Bring down Docker Network
 
 bonus: up_bonus
 
-up_bonus: check_host check_volumes check_volumes_bonus
+up_bonus: setup
 	@echo "$(CYA)Docker Compose Bonus $(GRN)UP$(D)..."
 	docker compose -f $(DOCKER_BONUS_PATH) up --build
 

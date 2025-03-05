@@ -12,11 +12,11 @@ RUN apt-get update && apt upgrade -y && \
 
 # Add LLVM repository for newer versions
 # Set LLVM 19 as default
-ENV LLVM_VERSION=19
-RUN wget https://apt.llvm.org/llvm.sh && \
-    chmod +x llvm.sh && \
-    ./llvm.sh ${LLVM_VERSION} && \
-    rm llvm.sh
+# ENV LLVM_VERSION=19
+# RUN wget https://apt.llvm.org/llvm.sh && \
+#     chmod +x llvm.sh && \
+#     ./llvm.sh ${LLVM_VERSION} && \
+#     rm llvm.sh
 
 ENV CC=clang-${LLVM_VERSION}
 ENV CXX=clang++-${LLVM_VERSION}
