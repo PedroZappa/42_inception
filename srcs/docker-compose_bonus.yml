@@ -193,7 +193,7 @@ services:
     image: adminer:42
 
     ports: 
-      - target: 8080
+      - 8080:8080
     networks:
       - inception
     restart: on-failure:7
@@ -234,6 +234,7 @@ services:
       timeout: 5s
       retries: 3
 
+  # Weechat
   weechat:
     image: jess/weechat  # Using an existing Weechat image
     container_name: weechat

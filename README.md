@@ -33,6 +33,9 @@ ___
         * [`MariaDB`](#mariadb)
         * [`WordPress`](#wordpress)
         * [`Nginx`](#nginx)
+      * [Bonus Services](#bonus-services)
+        * [`Website`](#website)
+      * ['Redis'](#redis)
       * [Persistent Volumes](#persistent-volumes)
     * [Secrets Management](#secrets-management)
   * [Usage 🏁](#usage-)
@@ -141,12 +144,35 @@ ___
 - **Volumes**: `wp_data` for serving WordPress data.
 - **@ Port**: `443`
 
+#### Bonus Services
+
+##### `Website`
+
+- **Build Context**: `./requirements/bonus/website`
+- **Container Name**: 
+    - `website`
+- **Volumes**: `ws_data` for serving static website data.
+
+#### 'Redis'
+
+- **Build Context**: `./requirements/bonus/redis`
+- **Container Name**: 
+    - `redis`
+- **Dependencies**: Requires WordPress.
+- **@ Port**: `6379`
+
 #### Persistent Volumes
 
 - `db_data`: for persistent `MariaDB` database storage.
     - **Path**: `/home/passunca/data/db`
 - `wp_data`: for persistent `WordPress` content storage.
     - **Path**: `/home/passunca/data/wp`
+- `ws_data`: for persistent static website content storage.
+    - **Path**: `/home/passunca/data/ws`
+- `irc_data`: for persistent `UnrealIRCd` data storage.
+  - **Path**: `/home/passunca/data/irc`
+- `doom_data`: for persistent `Doom` data storage.
+  - **Path**: `/home/passunca/data/doom`
 
 ___
 
@@ -200,11 +226,6 @@ MYSQL_HOST=mariadb
 WP_ADMIN=wpa
 WP_USER=wpu
 
-# FTP
-FTP_USER=ftpuser
-
-# IRC
-
 ```
 
 3. Build the Docker images:
@@ -221,6 +242,7 @@ ___
 # Docker Glossary 📖
 
 - [Docker GLOSS.md](GLOSS.md)
+- [Adminer Docs](https://www.adminer.org/)
 
 # References 📚
 

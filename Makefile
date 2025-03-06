@@ -138,7 +138,7 @@ weechat: ## Run Weechat container
 	docker start weechat 2>/dev/null || docker run --rm -it --name weechat --network inception jess/weechat
 	docker exec -it weechat weechat
 
-doom:
+doom: ## Run Doom container
 	@if command -v ghostty >/dev/null 2>&1; then \
 		ghostty -e docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom; \
 	elif command -v x-terminal-emulator >/dev/null 2>&1; then \
