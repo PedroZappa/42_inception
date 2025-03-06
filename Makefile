@@ -164,6 +164,9 @@ doom:
 		echo "docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom"; \
 	fi
 
+parrot: ## Run parrot.live container
+	docker exec -it parrot curl parrot.live
+
 ##@ Debug Rules 
 
 status: ## Get Network Status
