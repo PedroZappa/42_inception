@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Random Image</title>
+  <title>Zedro's Random Image Generator</title>
   <style>
     body {
       display: flex;
@@ -34,8 +34,8 @@
     const randomImage = images[Math.floor(Math.random() * images.length)];
 
     const imgElement = document.createElement("img");
-    imgElement.src = "site/img/" + randomImage; // Updated path to site/img/
-    imgElement.alt = "Random Image";
+    imgElement.src = "./img/" + randomImage; // Updated path to site/img/
+    imgElement.alt = "Z Random Image";
     document.body.appendChild(imgElement);
   </script>
 </body>
