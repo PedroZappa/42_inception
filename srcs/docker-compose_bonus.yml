@@ -234,6 +234,16 @@ services:
       timeout: 5s
       retries: 3
 
+  weechat:
+    image: jess/weechat  # Using an existing Weechat image
+    container_name: weechat
+    networks:
+      - inception  # Join the same network as UnrealIRCd
+    stdin_open: true  # Keep STDIN open for interactivity
+    tty: true         # Allocate a pseudo-TTY
+    depends_on:
+      - unrealircd  # Ensure UnrealIRCd starts first
+
   ### terminal-doom
   doom:
     build: ./requirements/bonus/doom
