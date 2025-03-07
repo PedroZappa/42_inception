@@ -213,13 +213,13 @@ The project uses Docker volumes with bind mounts to ensure data persistence:
 - **Dependencies**: Starts after IRC server is running
 
 ### Doom Service
-- **Container**: `doom` for running classic Doom game
+- **Container**: `doom` for running classic Doom game in your terminal
 - **Image Tag**: `doom:42`
 - **Exposed Port**: 3333
 - **Configuration**: Interactive TTY for game interaction
 
 ### Parrot Service
-- **Container**: `parrot` (purpose unclear from configuration)
+- **Container**: `parrot` (for the lulz and the curlz)
 - **Image Tag**: `parrot:42`
 - **Configuration**: Interactive TTY for user connection
 
