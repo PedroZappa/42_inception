@@ -44,6 +44,7 @@ ___
   * [Doom Service](#doom-service)
   * [Parrot Service](#parrot-service)
 * [Notable Configuration Patterns](#notable-configuration-patterns)
+* [References](#references)
 
 <!-- mtoc-end -->
 
@@ -189,5 +190,18 @@ The project uses Docker volumes with bind mounts to ensure data persistence:
 4. **Restart Policies**: Consistent policies for container reliability
 5. **Volume Mounting**: Systematic approach to data persistence
 6. **Secret Handling**: Secure credential management using Docker secrets
+
+___
+
+## References
+
+1. [Docker Security Best Practices: Cheat Sheet - GitGuardian Blog](https://blog.gitguardian.com/how-to-improve-your-docker-containers-security-cheat-sheet/)
+2. [Docker Security Best Practices: A Complete Guide - Anchore](https://anchore.com/blog/docker-security-best-practices-a-complete-guide/)
+3. [Security - Docker Docs](https://docs.docker.com/security/)
+4. [21 Docker Security Best Practices: Daemon, Image, Containers - Spacelift](https://spacelift.io/blog/docker-security)
+5. [Docker Security - OWASP Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)
+6. [Top 20 Dockerfile best practices - Sysdig](https://sysdig.com/learn-cloud-native/dockerfile-best-practices/)
+7. [Docker Engine security - Docker Docs](https://docs.docker.com/engine/security/)
+8. [Building best practices - Docker Docs](https://docs.docker.com/build/building/best-practices/)
 
 This Docker infrastructure demonstrates best practices for containerized application deployment with a focus on security, reliability, and maintainability.
