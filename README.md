@@ -11,8 +11,8 @@
     <img src="https://img.shields.io/github/languages/count/PedroZappa/42_inception?style=for-the-badge&logo=" />
     <img src="https://img.shields.io/github/languages/top/PedroZappa/42_inception?style=for-the-badge" />
     <img src="https://img.shields.io/github/last-commit/PedroZappa/42_inception?style=for-the-badge" />
-![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/PedroZappa/42_inception?labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit%20Reviews)
 </p>
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/PedroZappa/42_inception?labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit%20Reviews)
 
 ___
 
