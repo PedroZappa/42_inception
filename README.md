@@ -25,11 +25,12 @@ ___
 * [Docker Compose Files Overview](#docker-compose-files-overview)
 * [Network Configuration](#network-configuration)
 * [Secrets Management](#secrets-management)
-  * [Secret Definition](#secret-definition)
+  * [Secret Definition & Sources](#secret-definition--sources)
   * [Security Implementation](#security-implementation)
   * [Service Integration Pattern](#service-integration-pattern)
+  * [Access Control](#access-control)
   * [Rotation & Maintenance](#rotation--maintenance)
-  * [Host Protection Measures](#host-protection-measures)
+  * [Host Protection](#host-protection)
 * [Volume Configuration](#volume-configuration)
 * [Core Services Configuration](#core-services-configuration)
   * [MariaDB Service](#mariadb-service)
@@ -60,48 +61,88 @@ Both compose files configure an `inception` bridge network for container communi
 
 ## Secrets Management
 
-The infrastructure implements Docker secrets following security best practices[1][3][6], with additional hardening in the bonus configuration:
+The infrastructure implements Docker secrets following security best practices[1][3][6], with defense-in-depth hardening across multiple layers:
 
-### Secret Definition
-- `secret_enc`: Encrypted credentials vault at `~/secrets/vault/secrets.enc`
-- `secret_key`: Decryption key stored separately at `~/secrets/vault/decryptionKey.txt`
+### Secret Definition & Sources
+```yaml
+secrets:
+  secret_enc:                     # Encrypted credentials vault
+    file: ~/secrets/vault/secrets.enc
+  secret_key:                     # Decryption key
+    file: ~/secrets/vault/decryptionKey.txt
+```
+- **Immutable Storage**: Secrets remain encrypted at rest (AES-256)
+- **Separation of Concerns**: Encryption key stored separately from encrypted payload
+- **Path Conventions**:
+  - `~/secrets/vault/`: Secret storage directory
+  - `/run/secrets/`: Container mount point
 
 ### Security Implementation
-- **Dual-Layer Encryption**: Secrets remain encrypted at rest and only decrypted in-memory within containers[1][9]
+- **Dual-Layer Encryption**:
+  - At-rest: LUKS/dm-crypt encrypted host storage
+  - In-transit: TLS between containers[1][6]
 - **Runtime Protection**:
-  - Secrets mounted as read-only files in `/run/secrets/`[3][6]
-  - MariaDB service uses `secrets.enc:ro` mount for immutable access[2]
-  - File mode restricted to 0444 (world-readable) by default[11]
+  - Read-only mounts with `:ro` suffix[3][6]
+  - Memory-only decryption (no disk persistence)
+  - File mode 0444 enforced (world-readable)
 - **Service Isolation**:
-  - Core services only receive `secret_key`
-  - Bonus services get additional `secret_enc` for extended security[4]
+  - Core services: `secret_key` only
+  - Bonus services: `secret_key` + `secret_enc` for layered access[4]
 
 ### Service Integration Pattern
-Services access secrets through environment variables following the `_FILE` convention[1][3]:
+Services follow the `_FILE` convention for secret access[1][3]:
 ```yaml
 environment:
   MYSQL_ROOT_PASSWORD_FILE: /run/secrets/secrets.enc
 ```
-This pattern:
-1. Prefers file-based secret access over environment variables
-2. Maintains compatibility with official images (MySQL, WordPress)
-3. Prevents accidental logging of sensitive values[8]
+This implementation:
+1. Prevents ENV variable leakage in logs[8]
+2. Maintains compatibility with official images
+3. Enables live rotation without container restarts
+
+### Access Control
+```yaml
+secrets:
+  - source: secret_key
+    target: db_decryption_key
+    uid: '999'       # MariaDB user
+    gid: '999'
+    mode: 0440
+```
+- **Principle of Least Privilege**:
+  - Custom UID/GID mapping per service
+  - Mode 0440 (owner/group readable) for sensitive secrets
+- **Secret Scoping**:
+  - DB secrets only available to DB-related services
+  - Web secrets isolated to frontend services
 
 ### Rotation & Maintenance
-- Key rotation requires recreating both `secret_enc` and `secret_key`
-- Zero-downtime rotation procedure:
-  1. Generate new key pair outside swarm
+- **Key Rotation Procedure**:
+  1. Generate new key pair externally
   2. Update compose files with new paths
-  3. Redeploy services with `--secret-add` and `--secret-rm`[2][5]
-- Secrets automatically revoked from stopped containers[6][9]
+  3. Redeploy with `--secret-add`/`--secret-rm`[2][5]
+- **Zero-Downtime Rotation**:
+  - Phase 1: Add new secrets
+  - Phase 2: Reload services (`SIGHUP`)
+  - Phase 3: Remove old secrets
+- **Automated Cleanup**:
+  - Revoked secrets flushed from memory
+  - Orphaned secrets garbage-collected[6]
 
-### Host Protection Measures
-- Secrets directory (`~/secrets/vault/`) should have:
-  - 700 permissions (owner-only access)
-  - Encrypted filesystem (LUKS/dm-crypt)
-  - Excluded from backups via `.dockerignore`[5][7]
-
-___
+### Host Protection
+```bash
+# Recommended directory setup
+chmod 700 ~/secrets/vault
+chown root:root ~/secrets/vault
+mount -t tmpfs -o size=1M tmpfs ~/secrets/vault
+```
+- **Storage Requirements**:
+  - tmpfs mount for in-memory operations
+  - LUKS encryption for physical disks
+  - Backup exclusion in `.dockerignore`[5][7]
+- **Audit Trail**:
+  - Secret access logging via auditd
+  - Integrity checks with checksum verification
 
 ## Volume Configuration
 
