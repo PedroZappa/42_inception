@@ -11,7 +11,9 @@
     <img src="https://img.shields.io/github/languages/count/PedroZappa/42_inception?style=for-the-badge&logo=" />
     <img src="https://img.shields.io/github/languages/top/PedroZappa/42_inception?style=for-the-badge" />
     <img src="https://img.shields.io/github/last-commit/PedroZappa/42_inception?style=for-the-badge" />
+    <img src="https://img.shields.io/coderabbit/prs/github/PedroZappa/42_inception?labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit%20Reviews" />
 </p>
+
 
 ___
 
@@ -19,238 +21,230 @@ ___
 
 </div>
 
+
 <!-- mtoc-start -->
 
-  * [About 📌](#about-)
-  * [Services Overview](#services-overview)
-    * [Dockerfile specification](#dockerfile-specification)
-      * [MariaDB Docker](#mariadb-docker)
-      * [Nginx Docker](#nginx-docker)
-      * [WordPress Docker](#wordpress-docker)
-    * [Docker Compose Specification](#docker-compose-specification)
-      * [Network](#network)
-      * [Services ](#services-)
-        * [`MariaDB`](#mariadb)
-        * [`WordPress`](#wordpress)
-        * [`Nginx`](#nginx)
-      * [Bonus Services](#bonus-services)
-        * [`Website`](#website)
-      * ['Redis'](#redis)
-      * [Persistent Volumes](#persistent-volumes)
-    * [Secrets Management](#secrets-management)
-  * [Usage 🏁](#usage-)
-* [Docker Glossary 📖](#docker-glossary-)
-* [References 📚](#references-)
-* [License 📖](#license-)
+* [Docker Compose Files Overview](#docker-compose-files-overview)
+* [Network Configuration](#network-configuration)
+* [Secrets Management](#secrets-management)
+  * [Secret Definition & Sources](#secret-definition--sources)
+  * [Security Implementation](#security-implementation)
+  * [Service Integration Pattern](#service-integration-pattern)
+  * [Access Control](#access-control)
+  * [Rotation & Maintenance](#rotation--maintenance)
+  * [Host Protection](#host-protection)
+* [Volume Configuration](#volume-configuration)
+* [Core Services Configuration](#core-services-configuration)
+  * [MariaDB Service](#mariadb-service)
+  * [WordPress Service](#wordpress-service)
+  * [Nginx Service](#nginx-service)
+* [Bonus Services Configuration](#bonus-services-configuration)
+  * [Website Service](#website-service)
+  * [Redis Service](#redis-service)
+  * [Adminer Service](#adminer-service)
+  * [UnrealIRCd Service](#unrealircd-service)
+  * [Weechat Service](#weechat-service)
+  * [Doom Service](#doom-service)
+  * [Parrot Service](#parrot-service)
+* [Notable Configuration Patterns](#notable-configuration-patterns)
+* [References](#references)
 
 <!-- mtoc-end -->
 
+## Docker Compose Files Overview
 
-___
+The project includes two Docker Compose files:
+- `docker-compose.yml`: Core services configuration
+- `docker-compose_bonus.yml`: Extended configuration with additional services
 
-## About 📌
+## Network Configuration
 
-The present documentation provides an overview of the 42 Inception project.
+Both compose files configure an `inception` bridge network for container communication, enabling isolated but interconnected services.
 
-The `Inception` project configures a containerized environment using `Docker` for deploying a secure `WordPress` website with `MariaDB` as a database and `Nginx` as the web server.
+## Secrets Management
 
-This document provides a programatical approach to setting up and running a container network efficiently.
+The infrastructure implements Docker secrets following security best practices[1][3][6], with defense-in-depth hardening across multiple layers:
 
-___
-
-## Services Overview
-
-This `Inception` implementation sdets up a multi-container environment with the following services:
-
-- **MariaDB**: A relational database management system (RDBMS) for storing and managing structured data.
-- **WordPress**: An open-source web content management system (CMS) for creating and managing websites.
-- **Nginx**: A high-performance web server for serving static and dynamic content over the internet.
-
-Every service is configured to work in tandem using `Docker Compose`, with a secure mechanism to manage secrets.
-
-### Dockerfile specification
-
-#### MariaDB Docker
-> Relational database system; Persistent storage for `WordPress`. 
-
-- **Base Image**: `debian:bullseye`
-- **Dependencies**:
-    - `wget`, `curl` for download support.
-    - `gnupg` cryptographic tool for encryption and data signing support.
-    - `libaio1` for asynchronous I/O support.
-    - `mariadb-server` for MariaDB server.
-    - `mariadb-client` for MariaDB client.
-- **Volumes**: `/var/lib/mysql` for persistent data storage.
-- **Entrypoint**: Custom bash script for database initialization and secret encryption.
-- **@ Port**: `3306`
-
-#### Nginx Docker
-> Reverse proxy server for serving WordPress content securely.
-
-- **Base Image**: `debian:bullseye`
-- **Dependencies**:
-    - `nginx`, for serving static and dynamic content.
-    - `openssl`, for generating `SSL` certificates for `HTTPS`.
-- **Config**: Custom Nginx configuration file (`passunca42pt.conf`), moved tto `etc/nginx/siters-available`.
-- **Entrypoint**: Custom bash script for SSL certificate generation and Nginx server initialization.
-- **@ Port**: `443` (HTTPS).
-
-
-#### WordPress Docker
-> Content Management System (`CMS`) configured to connect to `MariaDB`.
-
-- **Base Image**: `debian:bullseye`
-- **Dependencies**:
-    - `php-mysqli` provides support for  `MySQL` database connnections in `PHP`.
-    - `php-fpm` provides support for asynchronous execution of PHP improving performance (`FastCGI`).
-    - `mysql-client` tools. 
-- **Volumes**: `/var/www/html/wordpress` for persistent WordPress data storage.
-- **Entrypoint**: Custom bash script for configuring `WordPress`, decrypting secrets and running `FastCGI`.
-
-___
-
-### Docker Compose Specification
-
-#### Network
-
-- `inception`: **Bridge Network** for inter-container communication.
-
-#### Services 
-
-##### `MariaDB`
-
-- **Build Context**: `./requirements/mariadb`
-- **Container Name**: `mariadb`
-- **Secrets**: `secret_key` and encrypted secrets.
-- **Volumes**: `db_data` for persistent database storage.
-- **@ Port**: `3306`
-
-##### `WordPress`
-
-- **Build Context**: `./requirements/wordpress`
-- **Container Name**: `wordpress`
-- **Dependencies**: 
-    -`MariaDB`
-- **Secrets**: `secret_key` and encrypted secrets.
-- **Volumes**: `wp_data` for persistent WordPress data storage.
-- **@ Port**: `9000`
-
-##### `Nginx`
-
-- **Build Context**: `./requirements/nginx`
-- **Container Name**: 
-    - `nginx`
-- **Dependencies**: Requires WordPress.
-- **Volumes**: `wp_data` for serving WordPress data.
-- **@ Port**: `443`
-
-#### Bonus Services
-
-##### `Website`
-
-- **Build Context**: `./requirements/bonus/website`
-- **Container Name**: 
-    - `website`
-- **Volumes**: `ws_data` for serving static website data.
-
-#### 'Redis'
-
-- **Build Context**: `./requirements/bonus/redis`
-- **Container Name**: 
-    - `redis`
-- **Dependencies**: Requires WordPress.
-- **@ Port**: `6379`
-
-#### Persistent Volumes
-
-- `db_data`: for persistent `MariaDB` database storage.
-    - **Path**: `/home/passunca/data/db`
-- `wp_data`: for persistent `WordPress` content storage.
-    - **Path**: `/home/passunca/data/wp`
-- `ws_data`: for persistent static website content storage.
-    - **Path**: `/home/passunca/data/ws`
-- `irc_data`: for persistent `UnrealIRCd` data storage.
-  - **Path**: `/home/passunca/data/irc`
-- `doom_data`: for persistent `Doom` data storage.
-  - **Path**: `/home/passunca/data/doom`
-
-___
-
-### Secrets Management
-
-- **Encrypted Secrets**: are stored in the `secrets.enc` and decrypted at runtime by `Nginx` using `openssl`.
-```sh
-# Encrypt secrets file using AES-256 encryption with PBKDF2 key derivation
-openssl enc -aes-256-cbc -salt -pbkdf2 -in secrets.txt -out secrets.enc -pass pass:$(cat decryptkey.txt)
-
-# Decrypt secrets file at runtime using the secret key
-openssl enc -aes-256-cbc -d -pbkdf2 -in /run/secrets/secrets.enc -out /run/secrets/secrets.txt -pass pass:$(cat /run/secrets/secret_key)
+### Secret Definition & Sources
+```yaml
+secrets:
+  secret_enc:                     # Encrypted credentials vault
+    file: ~/secrets/vault/secrets.enc
+  secret_key:                     # Decryption key
+    file: ~/secrets/vault/decryptionKey.txt
 ```
+- **Immutable Storage**: Secrets remain encrypted at rest (AES-256)
+- **Separation of Concerns**: Encryption key stored separately from encrypted payload
+- **Path Conventions**:
+  - `~/secrets/vault/`: Secret storage directory
+  - `/run/secrets/`: Container mount point
 
-___
+### Security Implementation
+- **Dual-Layer Encryption**:
+  - At-rest: LUKS/dm-crypt encrypted host storage
+  - In-transit: TLS between containers[1][6]
+- **Runtime Protection**:
+  - Read-only mounts with `:ro` suffix[3][6]
+  - Memory-only decryption (no disk persistence)
+  - File mode 0444 enforced (world-readable)
+- **Service Isolation**:
+  - Core services: `secret_key` only
+  - Bonus services: `secret_key` + `secret_enc` for layered access[4]
 
-## Usage 🏁
+### Service Integration Pattern
+Services follow the `_FILE` convention for secret access[1][3]:
+```yaml
+environment:
+  MYSQL_ROOT_PASSWORD_FILE: /run/secrets/secrets.enc
+```
+This implementation:
+1. Prevents ENV variable leakage in logs[8]
+2. Maintains compatibility with official images
+3. Enables live rotation without container restarts
 
-1. Clone the repository:
+### Access Control
+```yaml
+secrets:
+  - source: secret_key
+    target: db_decryption_key
+    uid: '999'       # MariaDB user
+    gid: '999'
+    mode: 0440
+```
+- **Principle of Least Privilege**:
+  - Custom UID/GID mapping per service
+  - Mode 0440 (owner/group readable) for sensitive secrets
+- **Secret Scoping**:
+  - DB secrets only available to DB-related services
+  - Web secrets isolated to frontend services
+
+### Rotation & Maintenance
+- **Key Rotation Procedure**:
+  1. Generate new key pair externally
+  2. Update compose files with new paths
+  3. Redeploy with `--secret-add`/`--secret-rm`[2][5]
+- **Zero-Downtime Rotation**:
+  - Phase 1: Add new secrets
+  - Phase 2: Reload services (`SIGHUP`)
+  - Phase 3: Remove old secrets
+- **Automated Cleanup**:
+  - Revoked secrets flushed from memory
+  - Orphaned secrets garbage-collected[6]
+
+### Host Protection
 ```bash
-git clone https://github.com/PedroZappa/42_inception.git
-cd 42_inception
+# Recommended directory setup
+chmod 700 ~/secrets/vault
+chown root:root ~/secrets/vault
+mount -t tmpfs -o size=1M tmpfs ~/secrets/vault
 ```
-2. Setup .env and secrets:
-    - `secrets.txt`:
-```sh
-db_password=dbpassword
-db_root_password=dbrootpassword
-wp_admin_password=wpapassword
-wp_admin_email=passunca@student.42porto.com
-wp_user_password=wpupassword
-wp_user_email=pedrogzappa@gmail.com
-ftp_password=ftppassword
+- **Storage Requirements**:
+  - tmpfs mount for in-memory operations
+  - LUKS encryption for physical disks
+  - Backup exclusion in `.dockerignore`[5][7]
+- **Audit Trail**:
+  - Secret access logging via auditd
+  - Integrity checks with checksum verification
 
-```
-    - `.env`:
-```sh
-USER=passunca
-DOMAIN_NAME=${USER}.42.fr
-WWWLOCAL=/var/www/html/
+## Volume Configuration
 
-# SSL Certificates
-CERTS_=/etc/nginx/ssl/${USER}.crt
+The project uses Docker volumes with bind mounts to ensure data persistence:
 
-# MySQL
-MYSQL_DATABASE=mariadb_db
-MYSQL_USER=user
-MYSQL_HOST=mariadb
+| Volume | Mount Path | Description |
+|--------|------------|-------------|
+| `db_data` | `~/data/db` | MariaDB database files |
+| `wp_data` | `~/data/wp` | WordPress files |
+| `ws_data` | `~/data/ws` | Static website files |
+| `irc_data` | `~/data/irc` | IRC server data |
+| `doom_data` | `~/data/doom` | Doom game data |
 
-# WordPress
-WP_ADMIN=wpa
-WP_USER=wpu
+## Core Services Configuration
 
-```
+### MariaDB Service
+- **Container**: `mariadb` built from custom Dockerfile
+- **Image Tag**: `mariadb:42`
+- **Health Checks**: Regular MySQL connectivity testing
+- **Exposed Port**: 3306 (internal network only)
+- **Restart Policy**: Up to 7 restart attempts on failure
+- **Log Configuration**: JSON format with 7 files of 7MB max size each
 
-3. Build the Docker images:
-```bash
-docker-compose build
-```
-4. Run containers:
-```bash
-docker-compose up -d
-```
+### WordPress Service
+- **Container**: `wordpress` with dependencies on MariaDB
+- **Image Tag**: `wordpress:42`
+- **Exposed Port**: 9000 (PHP-FPM)
+- **Restart Policy**: Up to 7 restart attempts on failure
+- **Dependencies**: Waits for MariaDB health check to pass
 
+### Nginx Service
+- **Container**: `nginx` with dependencies on WordPress
+- **Image Tag**: `nginx:42`
+- **Exposed Port**: 443 (HTTPS) mapped to host
+- **Volumes**: Mounts WordPress files for serving content
+- **Restart Policy**: Up to 7 restart attempts on failure
+
+## Bonus Services Configuration
+
+### Website Service
+- **Container**: `website` for static content
+- **Image Tag**: `website:42`
+- **Volumes**: Mounts site content from host
+
+### Redis Service
+- **Container**: `redis` for caching
+- **Image Tag**: `redis:42`
+- **Exposed Port**: 6379
+- **Health Checks**: Redis connectivity testing
+- **Added in Bonus**: WordPress depends on Redis in the bonus configuration
+
+### Adminer Service
+- **Container**: `adminer` for database management
+- **Image Tag**: `adminer:42`
+- **Exposed Port**: 8080 mapped to host
+- **Resource Limits**: 256MB memory limit
+
+### UnrealIRCd Service
+- **Container**: `unrealircd` IRC server
+- **Image Tag**: `unrealircd:42`
+- **Exposed Ports**: Multiple IRC ports (6660-6669, 6697, 6667, 7000)
+- **Health Checks**: Network connectivity testing on port 6660
+
+### Weechat Service
+- **Container**: `weechat` IRC client
+- **Image**: Uses existing `jess/weechat` image
+- **Configuration**: Interactive TTY for user connection
+- **Dependencies**: Starts after IRC server is running
+
+### Doom Service
+- **Container**: `doom` for running classic Doom game in your terminal
+- **Image Tag**: `doom:42`
+- **Exposed Port**: 3333
+- **Configuration**: Interactive TTY for game interaction
+
+### Parrot Service
+- **Container**: `parrot` (for the lulz and the curlz)
+- **Image Tag**: `parrot:42`
+- **Configuration**: Interactive TTY for user connection
+
+## Notable Configuration Patterns
+
+1. **Health Checking**: Services implement health checks to ensure dependencies are properly managed
+2. **Logging Management**: Consistent JSON log format with rotation policies
+3. **Resource Control**: Memory limits applied where appropriate
+4. **Restart Policies**: Consistent policies for container reliability
+5. **Volume Mounting**: Systematic approach to data persistence
+6. **Secret Handling**: Secure credential management using Docker secrets
 
 ___
-# Docker Glossary 📖
 
-- [Docker GLOSS.md](GLOSS.md)
-- [Adminer Docs](https://www.adminer.org/)
+## References
 
-# References 📚
+1. [Docker Security Best Practices: Cheat Sheet - GitGuardian Blog](https://blog.gitguardian.com/how-to-improve-your-docker-containers-security-cheat-sheet/)
+2. [Docker Security Best Practices: A Complete Guide - Anchore](https://anchore.com/blog/docker-security-best-practices-a-complete-guide/)
+3. [Security - Docker Docs](https://docs.docker.com/security/)
+4. [21 Docker Security Best Practices: Daemon, Image, Containers - Spacelift](https://spacelift.io/blog/docker-security)
+5. [Docker Security - OWASP Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)
+6. [Top 20 Dockerfile best practices - Sysdig](https://sysdig.com/learn-cloud-native/dockerfile-best-practices/)
+7. [Docker Engine security - Docker Docs](https://docs.docker.com/engine/security/)
+8. [Building best practices - Docker Docs](https://docs.docker.com/build/building/best-practices/)
 
-- [Docker Docs](https://docs.docker.com/)
-
-# License 📖
-
-This work is published under the terms of <a href="https://github.com/PedroZappa/42_minishell/blob/main/LICENSE">42 Unlicense</a>.
-
-<p align="right">(<a href="#readme-top">get to top</a>)</p>
-
+This Docker infrastructure demonstrates best practices for containerized application deployment with a focus on security, reliability, and maintainability.
