@@ -10,7 +10,7 @@ ls -al
 
 # Start a netcat listener to keep the container running
 # This allows potential network interaction and prevents the container from exiting
-nc -lk -p 3333 & 
+# nc -lk -p 3333 & 
 
 # Start terminal-doom
 echo "Starting terminal-doom..."

@@ -27,7 +27,7 @@ WORKDIR /terminal-doom
 RUN zig build -Doptimize=ReleaseFast
 
 # Expose Doom ports
-EXPOSE 3333
+# EXPOSE 3333
 
 # Copy custom Entrypoint bash script
 COPY ./tools/entrypoint.sh /entrypoint.sh
