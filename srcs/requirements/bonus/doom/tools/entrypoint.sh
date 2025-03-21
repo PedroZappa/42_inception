@@ -8,10 +8,20 @@ cd /data/doom
 echo "Current directory: $(pwd)"
 ls -al
 
-# Start a netcat listener to keep the container running
-# This allows potential network interaction and prevents the container from exiting
-# nc -lk -p 3333 & 
+
+# Trap SIGTERM and forward it to the child process
+trap 'kill -TERM $child' SIGTERM SIGINT
 
 # Start terminal-doom
 echo "Starting terminal-doom..."
-/terminal-doom/zig-out/bin/terminal-doom
+/terminal-doom/zig-out/bin/terminal-doom &
+
+
+# Store the PID of the application
+child=$!
+
+# Wait for the application to terminate
+wait $child
+
+# Exit with the same code as the application
+exit $?

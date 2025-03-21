@@ -207,13 +207,4 @@ services:
     restart: unless-stopped  # Restart policy to keep container running
     
   ### Parrot
-  parrot:
-    build: ./requirements/bonus/parrot
-    container_name: parrot
-    image: parrot:42  # Use a lightweight Alpine Linux image
-    networks:
-      - inception
-    stdin_open: true  # Keep STDIN open for interactivity
-    tty: true         # Allocate a pseudo-TTY
-    restart: unless-stopped  # Ensure the container keeps running
 
