@@ -61,7 +61,7 @@ services:
       - ${HOME}/secrets/.env         # Loads environment variables from this file
 
     restart:                   # Container restart policy
-      on-failure:7             # Restart up to 5 times if container exits with non-zero code
+      on-failure:7             # Restart up to 7 times if container exits with non-zero code
 
     expose:                    # Ports exposed only to other containers (not to host)
       - "3306"                 # Standard MariaDB/MySQL port
