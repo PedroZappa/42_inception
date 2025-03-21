@@ -144,7 +144,6 @@ services:
 
     ports:
       - "443:443"
-      - "80:80"
     networks:
       - inception
 
@@ -205,6 +204,3 @@ services:
     stdin_open: true  # Keep STDIN open
     tty: true         # Allocate a pseudo-TTY
     restart: unless-stopped  # Restart policy to keep container running
-    
-  ### Parrot
-

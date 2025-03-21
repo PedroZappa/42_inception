@@ -196,7 +196,7 @@ prune: fclean ## Prune Docker System
 	docker system prune -a
 
 clean: 				## Remove object files
-	@echo "*** $(YEL)Removing $(MAG)$(NAME)$(D)$(YEL)temporary files$(D)"
+	@echo "*** $(YEL)Removing $(MAG)$(NAME)$(D)$(YEL) temporary files$(D)"
 	@docker compose -f $(DOCKER_PATH) down --rmi all --volumes
 	@if [ -d "$(SECRETS_PATH)" ]; then \
 		if [ -d "$(SECRETS_PATH)" ]; then \
