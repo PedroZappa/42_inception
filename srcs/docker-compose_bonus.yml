@@ -5,9 +5,9 @@ networks:
 
 secrets:
   secret_enc:                     # The name of the first secret
-    file: ~/secrets/vault/secrets.enc   # Path to the encrypted secrets file on your host
+    file: ${HOME}/secrets/vault/secrets.enc   # Path to the encrypted secrets file on your host
   secret_key:                                # The name of the second secret
-    file: ~/secrets/vault/decryptionKey.txt  # Path to the decryption key file
+    file: ${HOME}/secrets/vault/decryptionKey.txt  # Path to the decryption key file
 
 volumes:
   ### MariaDB
@@ -16,7 +16,7 @@ volumes:
     driver: local           # Uses the local volume driver
     driver_opts:            # Options for the driver
       type: none            # Specifies a bind mount (not a volume with a filesystem)
-      device: ~/data/db     # The host path to mount (in your home directory)
+      device: ${HOME}/data/db     # The host path to mount (in your home directory)
       o: bind               # Mount option specifying this is a bind mount
   ### WordPress
   wp_data:
@@ -24,7 +24,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ~/data/wp
+      device: ${HOME}/data/wp
       o: bind
   ### Website
   ws_data:
@@ -32,15 +32,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ~/data/ws
-      o: bind
-  ### UnrealIRCd
-  irc_data:
-    name: irc_data
-    driver: local
-    driver_opts:
-      type: none
-      device: ~/data/irc
+      device: ${HOME}/data/ws
       o: bind
   ### Doom
   doom_data:
@@ -48,7 +40,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ~/data/doom
+      device: ${HOME}/data/doom
       o: bind
 
 services:
@@ -60,13 +52,13 @@ services:
 
     volumes:                   # Mounts storage to the container
       - db_data:/var/lib/mysql  # Uses the named volume "db_data" for database storage
-      - ~/secrets/vault/secrets.enc:/run/secrets/secrets.enc:ro  # Mounts host file as read-onlyVAULT/
+      - ${HOME}/secrets/vault/secrets.enc:/run/secrets/secrets.enc:ro  # Mounts host file as read-onlyVAULT/
 
     secrets:                   # Docker secrets to inject into the container
       - secret_key             # Makes the "secret_key" available inside the container
       - secret_enc             # Makes the "secret_key" available inside the container
     env_file:                  # Environment variables file
-      - ~/secrets/.env         # Loads environment variables from this file
+      - ${HOME}/secrets/.env         # Loads environment variables from this file
 
     restart:                   # Container restart policy
       on-failure:7             # Restart up to 5 times if container exits with non-zero code
@@ -101,12 +93,12 @@ services:
         condition: service_healthy   
     volumes:
       - wp_data:/var/www/html/wordpress
-      - ~/secrets/vault/secrets.enc:/run/secrets/secrets.enc
+      - ${HOME}/secrets/vault/secrets.enc:/run/secrets/secrets.enc
 
     secrets:
       - secret_key
     env_file:
-      - ~/secrets/.env
+      - ${HOME}/secrets/.env
     restart:
       on-failure:7
 
@@ -146,7 +138,7 @@ services:
       - ws_data:/var/www/html/website
 
     env_file:
-      - ~/secrets/.env
+      - ${HOME}/secrets/.env
     restart:
       on-failure:7
 
@@ -200,52 +192,6 @@ services:
     mem_limit: 256M
     
   ### UnrealIRCd
-  unrealircd:
-    build: ./requirements/bonus/unrealircd
-    container_name: unrealircd
-    image: unrealircd:42
-    volumes:
-      - ~/data/unrealircd:/unrealircd:rw  # Mount a volume to store UnrealIRCd data and configuration
-      - ~/secrets/vault/secrets.enc:/run/secrets/secrets.enc:ro  # Mounts host file as read-only
-
-    secrets:
-      - secret_key
-    env_file:
-      - ~/secrets/.env
-
-    networks:
-      - inception
-    ports:
-      - "6660-6669:6660-6669" # Expose IRC ports
-      - "6900:6900"
-      - "6697:6697"  # Explicitly map TLS port
-      - "6667:6667"  # Explicitly map non-TLS port
-      - "7000:7000"  # WebSocket port for services that connect via WebSockets
-    restart: on-failure:7  # Automatically restart on failure
-
-    logging:
-      driver: "json-file"
-      options:
-        max-file: "7"
-        max-size: "7m"
-    healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "6660"]  # Check if UnrealIRCd is responding on port 6660
-      interval: 30s
-      timeout: 5s
-      retries: 3
-
-  # Weechat
-  weechat:
-    image: jess/weechat  # Using an existing Weechat image
-    container_name: weechat
-    networks:
-      - inception  # Join the same network as UnrealIRCd
-    stdin_open: true  # Keep STDIN open for interactivity
-    tty: true         # Allocate a pseudo-TTY
-    depends_on:
-      - unrealircd  # Ensure UnrealIRCd starts first
-
-  ### terminal-doom
   doom:
     build: ./requirements/bonus/doom
     container_name: doom
@@ -259,7 +205,6 @@ services:
     stdin_open: true  # Keep STDIN open
     tty: true         # Allocate a pseudo-TTY
     restart: unless-stopped  # Restart policy to keep container running
-    command: [ "${HOME}/unrealircd/unrealircd", "start" ]
     
   ### Parrot
   parrot:
