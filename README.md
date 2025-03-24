@@ -48,6 +48,7 @@ ___
   * [Parrot Service](#parrot-service)
 * [Notable Configuration Patterns](#notable-configuration-patterns)
 * [References](#references)
+* [Study Articles](#study-articles)
 
 <!-- mtoc-end -->
 
@@ -246,5 +247,9 @@ ___
 6. [Top 20 Dockerfile best practices - Sysdig](https://sysdig.com/learn-cloud-native/dockerfile-best-practices/)
 7. [Docker Engine security - Docker Docs](https://docs.docker.com/engine/security/)
 8. [Building best practices - Docker Docs](https://docs.docker.com/build/building/best-practices/)
+
+## Study Articles
+
+* [Understanding Daemons in Computing Systems: From Concepts to Docker Implementation](https://www.perplexity.ai/page/understanding-daemons-in-compu-gCeFFp1RQZejr6w0VqHy7Q)
 
 This Docker infrastructure demonstrates best practices for containerized application deployment with a focus on security, reliability, and maintainability.
