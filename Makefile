@@ -58,7 +58,7 @@ all: setup ## Build project
 setup: check
 	./setup.sh
 
-check: check_host check_volumes ## Check Docker Status
+check: check_volumes ## Check Docker Status
 
 check_volumes: ## Check Docker Volumes
 	@echo "$(CYA)Checking Docker Volumes...$(D)"
@@ -163,9 +163,6 @@ doom: ## Run Doom container
 		echo "No supported terminal emulator found. Please open a terminal manually and run:"; \
 		echo "docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom"; \
 	fi
-
-parrot: ## Run parrot.live container
-	docker exec -it parrot curl parrot.live
 
 ##@ Debug Rules 
 
