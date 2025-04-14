@@ -26,6 +26,7 @@ volumes:
       type: none
       device: ${HOME}/data/wp
       o: bind
+
   ### Website
   ws_data:
     name: ws_data
@@ -153,6 +154,36 @@ services:
         max-size: "7m"
         max-file: "7"
 
+  ### FTP
+  ftp:
+    build: ./requirements/bonus/ftp
+    container_name: ftp
+    image: ftp:42
+    expose:
+      - "21"
+      - "10000-10100:10000-10100"
+    ports:
+      - "21:21"
+      - "10000-10100:10000-10100"
+    depends_on:
+      - wordpress
+    env_file:
+      - ${HOME}/secrets/.env
+    restart:
+      on-failure:7
+    volumes:
+      - wp_data:/var/ftp/users/ftpuser/
+      - ${HOME}/secrets/secrets.enc:/run/secrets/secrets.enc:ro
+    secrets:
+      - secret_key
+    networks:
+      - inception
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "7"
+        max-size: "7m"
+
   ### Redis
   redis:
     build: ./requirements/bonus/redis
@@ -190,7 +221,7 @@ services:
     restart: on-failure:7
     mem_limit: 256M
     
-  ### UnrealIRCd
+  ### Doom
   doom:
     build: ./requirements/bonus/doom
     container_name: doom
