@@ -33,15 +33,13 @@ FTP_PASSWORD=$(grep 'ftp_password=' /run/secrets/secrets.txt | cut -d '=' -f2)
 
 # Cleanup temporary secrets file
 rm /run/secrets/secrets.txt
-echo "Secrets 'temporary file' deleted..."
+echo "Temporary Secrets file deleted..."
 
 # Create the FTP user if it doesn't exist
 if ! id -u ${FTP_USER} &>/dev/null; then
     echo "Creating FTP user ${FTP_USER}..."
     useradd -m ${FTP_USER}
     echo -e "${FTP_PASSWORD}\n${FTP_PASSWORD}" | passwd ${FTP_USER}
-    # mkdir -p /var/ftp/users/${FTP_USER}/uploads
-    # mkdir -p /var/ftp/users/${FTP_USER}/wordpress
 fi
 
 echo "Ensure FTP user has access to WordPress directory"
