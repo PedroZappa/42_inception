@@ -7,7 +7,7 @@ FROM debian:bullseye
 
 # Install vsftpd and other helper tools
 RUN apt-get update && \
-    apt-get install -y vsftpd openssl && \
+    apt-get install -y vsftpd openssl vim && \
     apt-get clean && \
     rm -fr /var/lib/apt/lists/*
 

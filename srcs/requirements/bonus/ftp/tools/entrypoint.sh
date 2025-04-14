@@ -14,7 +14,10 @@ trap cleanup SIGTERM
 # Decrypt secrets
 if [ -f /run/secrets/secrets.enc ]; then
     echo "Decrypting Secrets to 'temporary file'... "
-    openssl enc -aes-256-cbc -d -pbkdf2 -in /run/secrets/secrets.enc -out /run/secrets/secrets.txt -pass pass:$(cat /run/secrets/secret_key)
+    openssl enc -aes-256-cbc -pbkdf2 \
+      -in /run/secrets/secrets.enc \
+      -out /run/secrets/secrets.txt \
+      -pass file:/run/secrets/secret_key
     if [ $? -ne 0 ]; then
         echo "Error: Failed to decrypt secrets."
         exit 1

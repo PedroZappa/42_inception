@@ -171,8 +171,8 @@ services:
     restart:
       on-failure:7
     volumes:
-      - wp_data:/var/ftp/users/ftpuser/
-      - ${HOME}/secrets/secrets.enc:/run/secrets/secrets.enc:ro
+      - wp_data:/var/ftp/users/ftpuser/wordpress
+      - ${HOME}/secrets/vault/secrets.enc:/run/secrets/secrets.enc:ro
     secrets:
       - secret_key
     networks:
@@ -182,11 +182,11 @@ services:
       options:
         max-file: "7"
         max-size: "7m"
-    develop:
-      watch:
-        - action: sync
-          path: .
-          target: /
+    # develop:
+    #   watch:
+    #     - action: sync
+    #       path: .
+    #       target: /
 
   ### Redis
   redis:
