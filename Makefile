@@ -211,6 +211,7 @@ fclean: clean ## Remove All
 
 re: fclean all	## Purge & Recompile
 
+re_bonus: fclean_bonus up_bonus ## Purge & Recompile
 
 rmi_bonus: ## Remove Docker Network
 	echo "$(CYA)Docker Compose $(GRN)RMI$(D): remove container images..."
@@ -236,8 +237,6 @@ help: 			## Display this help page
 			printf "\t$(GRN)%-18s$(D) %s\n", $$1, $$2 } \
 		/^##@/ { \
 			printf "\n=> %s\n", substr($$0, 5) } ' Makefile
-
-re_bonus: fclean_bonus up_bonus ## Purge & Recompile
 
 ## Tweaked from source:
 ### https://www.padok.fr/en/blog/beautiful-makefile-awk
