@@ -1,20 +1,10 @@
 #!/bin/bash
 
-# Handle termination signals
-cleanup() {
-    echo "Gracefully stopping vsftpd..."
-    kill -TERM "$VSFTPD_PID"
-    wait "$VSFTPD_PID"
-    exit 0
-}
-# Catch SIGTERM
-trap cleanup SIGTERM
-
 # Open script scope for secrets safety
 # Decrypt secrets
 if [ -f /run/secrets/secrets.enc ]; then
     echo "Decrypting Secrets to 'temporary file'... "
-    openssl enc -aes-256-cbc -pbkdf2 \
+    openssl enc -aes-256-cbc -pbkdf2 -iter 100000\
       -in /run/secrets/secrets.enc \
       -out /run/secrets/secrets.txt \
       -pass file:/run/secrets/secret_key
