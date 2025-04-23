@@ -104,7 +104,7 @@ rm: stop ## Remove Docker Network
 	docker compose -f $(DOCKER_PATH) rm
 
 down: ## Bring down Docker Network
-	echo "$(CYA)Docker Compose $(GRN)DOWN$(D)..."
+	@echo "$(CYA)Docker Compose $(GRN)DOWN$(D)..."
 	docker compose -f $(DOCKER_PATH) down
 
 ## Bonus
@@ -128,7 +128,7 @@ rm_bonus: stop ## Remove Docker Network
 	docker compose -f $(DOCKER_BONUS_PATH) rm
 
 down_bonus: ## Bring down Docker Network
-	echo "$(CYA)Docker Compose $(GRN)DOWN$(D)..."
+	@echo "$(CYA)Docker Compose $(GRN)DOWN$(D)..."
 	docker compose -f $(DOCKER_BONUS_PATH) down
 
 
@@ -164,18 +164,21 @@ doom: ## Run Doom container
 		echo "docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom"; \
 	fi
 
+ftp: ## Connect to FTP service
+	ftp $(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ftp)
+
 ##@ Debug Rules 
 
 status: ## Get Network Status
 	@echo "$(CYA)Docker $(GRN)STATUS$(D)..."
+	@echo "$(GRN)docker ps -a$(D)"
 	docker ps -a
-	@echo ""
+	@echo "$(GRN)docker image ls$(D)"
 	docker image ls
-	@echo ""
+	@echo "$(GRN)docker volume ls$(D)"
 	docker volume ls
-	@echo ""
+	@echo "$(GRN)docker network ls$(D)"
 	docker network ls
-	@echo ""
 
 ##@ Clean-up Rules 󰃢
 

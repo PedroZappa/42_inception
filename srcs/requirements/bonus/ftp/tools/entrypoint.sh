@@ -4,7 +4,7 @@
 # Decrypt secrets
 if [ -f /run/secrets/secrets.enc ]; then
     echo "Decrypting Secrets to 'temporary file'... "
-    openssl enc -aes-256-cbc -pbkdf2 -iter 100000\
+    openssl enc -aes-256-cbc -d -pbkdf2 -iter 100000 \
       -in /run/secrets/secrets.enc \
       -out /run/secrets/secrets.txt \
       -pass file:/run/secrets/secret_key
@@ -25,14 +25,16 @@ chmod 600 /run/secrets/secrets.txt
 FTP_PASSWORD=$(grep 'ftp_password=' /run/secrets/secrets.txt | cut -d '=' -f2)
 
 # Cleanup temporary secrets file
-rm /run/secrets/secrets.txt
-echo "Temporary Secrets file deleted..."
+# rm /run/secrets/secrets.txt
+# echo "Temporary Secrets file deleted..."
 
 # Create the FTP user if it doesn't exist
 if ! id -u ${FTP_USER} &>/dev/null; then
     echo "Creating FTP user ${FTP_USER}..."
     useradd -m ${FTP_USER}
     echo -e "${FTP_PASSWORD}\n${FTP_PASSWORD}" | passwd ${FTP_USER}
+else
+    echo "${FTP_USER} already exists!"
 fi
 
 echo "Ensure FTP user has access to WordPress directory"
