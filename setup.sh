@@ -16,9 +16,6 @@ SECRETS_FILE="$VAULT_DIR/secrets.txt"
 ENCRYPTED_FILE="$VAULT_DIR/secrets.enc"
 KEY_FILE="$VAULT_DIR/decryptionKey.txt"
 
-ln -sfn "$SECRETS_DIR" ./secrets
-echo "Created symlink: ./secrets -> $SECRETS_DIR"
-
 # Create necessary directories
 # Ensure the secrets directory exists and has correct permissions
 mkdir -p "$SECRETS_DIR"
@@ -27,6 +24,10 @@ chmod 700 "$SECRETS_DIR"
 mkdir -p "$TLS_DIR"
 mkdir -p ~/data/ws ~/data/wp ~/data/db ~/data/unrealircd ~/data/doom
 echo "Directories created successfully!"
+
+if ln -sfn "$SECRETS_DIR" "${PWD}/secrets"; then
+  echo "Created symlink: ./secrets -> $SECRETS_DIR"
+fi
 
 # Generate a dummy decryption key if it does not exist
 if [[ ! -f "$KEY_FILE" ]]; then
