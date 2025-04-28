@@ -27,11 +27,12 @@ ___
 * [Secrets Management](#secrets-management)
   * [Secret Definition & Sources](#secret-definition--sources)
   * [Security Implementation](#security-implementation)
-  * [Service Integration Pattern](#service-integration-pattern)
   * [Access Control](#access-control)
   * [Rotation & Maintenance](#rotation--maintenance)
   * [Host Protection](#host-protection)
 * [Volume Configuration](#volume-configuration)
+  * [Mandatory Configuration](#mandatory-configuration)
+  * [Bonus Configuration](#bonus-configuration)
 * [Core Services Configuration](#core-services-configuration)
   * [MariaDB Service](#mariadb-service)
   * [WordPress Service](#wordpress-service)
@@ -40,10 +41,10 @@ ___
   * [Website Service](#website-service)
   * [Redis Service](#redis-service)
   * [Adminer Service](#adminer-service)
-  * [UnrealIRCd Service](#unrealircd-service)
-  * [Weechat Service](#weechat-service)
   * [Doom Service](#doom-service)
-  * [Parrot Service](#parrot-service)
+* [Tests](#tests)
+  * [Adminer Service](#adminer-service-1)
+  * [FTP Service](#ftp-service)
 * [Notable Configuration Patterns](#notable-configuration-patterns)
 * [References](#references)
 * [Study Articles](#study-articles)
@@ -55,7 +56,7 @@ ___
 The project includes two Docker Compose files:
 
 * `docker-compose.yml`: Core services configuration
-* `docker-compose_bonus.yml`: Extended configuration with additional services
+* `docker-compose_bonus.yml`: Extended configuration with aditional services
 
 ## Network Configuration
 
@@ -72,7 +73,7 @@ with defense-in-depth hardening across multiple layers:
 ```yaml
 secrets:
   secret_enc:                     # Encrypted credentials vault
-    file: ~/secrets/vault/secrets.enc
+    file: ~/secrets/secrets.enc
   secret_key:                     # Decryption key
     file: ~/secrets/vault/decryptionKey.txt
 ```
@@ -95,21 +96,6 @@ secrets:
 * **Service Isolation**:
   * Core services: `secret_key` only
   * Bonus services: `secret_key` + `secret_enc` for layered access[4]
-
-### Service Integration Pattern
-
-Services follow the `_FILE` convention for secret access:
-
-```yaml
-environment:
-  MYSQL_ROOT_PASSWORD_FILE: /run/secrets/secrets.enc
-```
-
-This implementation:
-
-1. Prevents ENV variable leakage in logs[8]
-2. Maintains compatibility with official images
-3. Enables live rotation without container restarts
 
 ### Access Control
 
@@ -164,12 +150,22 @@ mount -t tmpfs -o size=1M tmpfs ~/secrets/vault
 
 The project uses Docker volumes with bind mounts to ensure data persistence:
 
+### Mandatory Configuration
+
+| Volume | Mount Path | Description |
+|--------|------------|-------------|
+| `db_data` | `~/data/db` | MariaDB database files |
+| `wp_data` | `~/data/wp` | WordPress files |
+
+
+### Bonus Configuration
+
+
 | Volume | Mount Path | Description |
 |--------|------------|-------------|
 | `db_data` | `~/data/db` | MariaDB database files |
 | `wp_data` | `~/data/wp` | WordPress files |
 | `ws_data` | `~/data/ws` | Static website files |
-| `irc_data` | `~/data/irc` | IRC server data |
 | `doom_data` | `~/data/doom` | Doom game data |
 
 ## Core Services Configuration
@@ -222,20 +218,6 @@ The project uses Docker volumes with bind mounts to ensure data persistence:
 * **Exposed Port**: 8080 mapped to host
 * **Resource Limits**: 256MB memory limit
 
-### UnrealIRCd Service
-
-* **Container**: `unrealircd` IRC server
-* **Image Tag**: `unrealircd:42`
-* **Exposed Ports**: Multiple IRC ports (6660-6669, 6697, 6667, 7000)
-* **Health Checks**: Network connectivity testing on port 6660
-
-### Weechat Service
-
-* **Container**: `weechat` IRC client
-* **Image**: Uses existing `jess/weechat` image
-* **Configuration**: Interactive TTY for user connection
-* **Dependencies**: Starts after IRC server is running
-
 ### Doom Service
 
 * **Container**: `doom` for running classic Doom game in your terminal
@@ -243,11 +225,41 @@ The project uses Docker volumes with bind mounts to ensure data persistence:
 * **Exposed Port**: 3333
 * **Configuration**: Interactive TTY for game interaction
 
-### Parrot Service
+## Tests
 
-* **Container**: `parrot` (for the lulz and the curlz)
-* **Image Tag**: `parrot:42`
-* **Configuration**: Interactive TTY for user connection
+### Adminer Service
+
+* Open Adminer on Web Browser
+
+```web
+http://localhost:8080/
+```
+
+> * Test Credentials
+> Server: `mariadb`
+> User: `user`
+> Password: `dbpassword`
+> Database: `mariadb_db` (optional)
+
+### FTP Service
+
+* Connect to FTP server
+
+```bash
+make ftp
+```
+
+* Connect to ftp (ftp prompt)
+
+```ftp
+ftp> open localhost
+Name (localhost:zedro): `ftpuser`
+Password: `ftppassword`
+```
+
+
+____
+
 
 ## Notable Configuration Patterns
 
