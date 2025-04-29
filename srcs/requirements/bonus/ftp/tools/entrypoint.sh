@@ -40,7 +40,7 @@ fi
 echo "Ensure FTP user has access to WordPress directory"
 ln -s /var/ftp/users/${FTP_USER}/wordpress
 chown -R ${FTP_USER}:${FTP_USER} /var/ftp/users/${FTP_USER}/wordpress
-chmod -R 775 /var/ftp/users/${FTP_USER}/wordpress
+chmod -R 777 /var/ftp/users/${FTP_USER}/wordpress
 
 # Start vsftpd in the foreground
 echo "Starting vsftpd..."

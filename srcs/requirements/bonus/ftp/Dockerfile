@@ -2,7 +2,6 @@
 #                               FTP Dockerfile                               //
 # ************************************************************************** //
 
-
 FROM debian:bullseye
 
 # Install vsftpd and other helper tools

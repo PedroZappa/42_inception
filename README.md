@@ -257,6 +257,14 @@ Name (localhost:zedro): `ftpuser`
 Password: `ftppassword`
 ```
 
+* Connect to FileZilla
+
+```FileZilla
+Host: localhost
+Username: ftpuser
+Password: ftppassword
+Port: 21
+```
 
 ____
 

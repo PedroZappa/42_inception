@@ -134,10 +134,6 @@ down_bonus: ## Bring down Docker Network
 
 ##@ Test Rules 🧪
 
-weechat: ## Run Weechat container
-	docker start weechat 2>/dev/null || docker run --rm -it --name weechat --network inception jess/weechat
-	docker exec -it weechat weechat
-
 doom: ## Run Doom container
 	@if command -v ghostty >/dev/null 2>&1; then \
 		ghostty -e docker exec -it doom /terminal-doom/zig-out/bin/terminal-doom; \
@@ -231,6 +227,14 @@ clean_bonus:
 fclean_bonus: clean_bonus ## Prune Docker System
 	echo "$(CYA)Docker Compose $(GRN)FCLEAN$(D): prune system..."
 	sudo rm -fr ~/data
+
+kill:  ## Kill all running containers
+	docker stop $$(docker ps -qa); \
+	docker rm $$(docker ps -qa); \
+	docker rmi -f $$(docker images -qa); \
+	docker volume rm $$(docker volume ls -q); \
+	docker network rm $$(docker network ls -q) 2>/dev/null
+
 ##@ Help 󰛵
 
 help: 			## Display this help page

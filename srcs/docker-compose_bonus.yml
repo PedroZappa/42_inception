@@ -103,7 +103,7 @@ services:
       on-failure:7
 
     expose:
-      - "9000:9000"
+      - "9000"
     networks:
       - inception
 
@@ -160,7 +160,7 @@ services:
     image: ftp:42
     expose:
       - "21"
-      - "10000-10100:10000-10100"
+      - "10000-10100"
     ports:
       - "21:21"
       - "10000-10100:10000-10100"
@@ -182,11 +182,6 @@ services:
       options:
         max-file: "7"
         max-size: "7m"
-    # develop:
-    #   watch:
-    #     - action: sync
-    #       path: .
-    #       target: /
 
   ### Redis
   redis:

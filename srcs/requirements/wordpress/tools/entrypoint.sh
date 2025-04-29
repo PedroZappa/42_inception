@@ -85,6 +85,7 @@ chmod 600 /run/secrets/secrets.txt
     echo "Get to a WordPress site here : https://passunca.42.fr"
     echo "Get to WordPress Admin Dashboard here : https://passunca.42.fr/wp-admin"
     echo "Get to a (bonus) static site here : https://passunca.42.pt"
+    echo "Get to a (bonus) Aminer service : http://localhost:8080"
 )
 
 # Start PHP-FPM
