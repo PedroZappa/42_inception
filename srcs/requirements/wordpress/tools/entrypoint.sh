@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # Entrypoint script for WordPress docker image
+sed -i '/listen = /c\listen = 9000' /etc/php/7.4/fpm/pool.d/www.conf
 
 ENCRYPTED_FILE=/run/secrets/secrets.enc
 DENCRYPTED_FILE=/run/secrets/secrets.txt
@@ -85,12 +86,11 @@ chmod 600 /run/secrets/secrets.txt
     echo "Get to a WordPress site here : https://passunca.42.fr"
     echo "Get to WordPress Admin Dashboard here : https://passunca.42.fr/wp-admin"
     echo "Get to a (bonus) static site here : https://passunca.42.pt"
-    echo "Get to a (bonus) Aminer service : http://localhost:8080"
+    echo "Get to a (bonus) Adminer service : http://localhost:8080"
 )
 
 # Start PHP-FPM
 echo "Starting PHP-FPM..."
 # Configure PHP-FPM
-sed -i '/listen = /c\listen = 9000' /etc/php/7.4/fpm/pool.d/www.conf
 exec php-fpm7.4 -F
 echo "PHP-FPM started."
