@@ -22,32 +22,30 @@ ___
 
 <!-- mtoc-start -->
 
-* [Docker Compose Files Overview](#docker-compose-files-overview)
-* [Network Configuration](#network-configuration)
-* [Secrets Management](#secrets-management)
-  * [Secret Definition & Sources](#secret-definition--sources)
-  * [Security Implementation](#security-implementation)
-  * [Access Control](#access-control)
-  * [Rotation & Maintenance](#rotation--maintenance)
-  * [Host Protection](#host-protection)
-* [Volume Configuration](#volume-configuration)
-  * [Mandatory Configuration](#mandatory-configuration)
-  * [Bonus Configuration](#bonus-configuration)
-* [Core Services Configuration](#core-services-configuration)
-  * [MariaDB Service](#mariadb-service)
-  * [WordPress Service](#wordpress-service)
-  * [Nginx Service](#nginx-service)
-* [Bonus Services Configuration](#bonus-services-configuration)
-  * [Website Service](#website-service)
-  * [Redis Service](#redis-service)
-  * [Adminer Service](#adminer-service)
-  * [Doom Service](#doom-service)
-* [Tests](#tests)
-  * [Adminer Service](#adminer-service-1)
-  * [FTP Service](#ftp-service)
-* [Notable Configuration Patterns](#notable-configuration-patterns)
-* [References](#references)
-* [Study Articles](#study-articles)
+  * [Docker Compose Files Overview](#docker-compose-files-overview)
+  * [Network Configuration](#network-configuration)
+  * [Secrets Management](#secrets-management)
+    * [Secret Definition & Sources](#secret-definition--sources)
+    * [Security Implementation](#security-implementation)
+    * [Access Control](#access-control)
+    * [Rotation & Maintenance](#rotation--maintenance)
+    * [Host Protection](#host-protection)
+  * [Volume Configuration](#volume-configuration)
+    * [Mandatory Configuration](#mandatory-configuration)
+    * [Bonus Configuration](#bonus-configuration)
+    * [Mariadb](#mariadb)
+* [Inside container](#inside-container)
+  * [Core Services Configuration](#core-services-configuration)
+    * [MariaDB Service](#mariadb-service)
+    * [WordPress Service](#wordpress-service)
+    * [Nginx Service](#nginx-service)
+  * [Bonus Services Configuration](#bonus-services-configuration)
+    * [Website Service](#website-service)
+    * [Redis Service](#redis-service)
+    * [Adminer Service](#adminer-service)
+    * [Doom Service](#doom-service)
+  * [Tests](#tests)
+    * [Mariadb Service](#mariadb-service-1)
 
 <!-- mtoc-end -->
 
@@ -161,6 +159,14 @@ The project uses Docker volumes with bind mounts to ensure data persistence:
 ### Bonus Configuration
 
 
+### Mariadb
+mariadbdocker exec -it mariadb -u user -ppassdbpassword mariadb_db
+
+# Inside container
+mari
+* Connect to B
+
+
 | Volume | Mount Path | Description |
 |--------|------------|-------------|
 | `db_data` | `~/data/db` | MariaDB database files |
@@ -226,6 +232,25 @@ The project uses Docker volumes with bind mounts to ensure data persistence:
 * **Configuration**: Interactive TTY for game interaction
 
 ## Tests
+
+### Mariadb Service
+
+* Connect to MariaDB
+
+```bash
+docker exec -it mariadb bash
+```
+* Get into MariaDB prompt
+
+```bash
+mariadb -u user -pdbpassword mariadb_db
+```
+
+* Select a table from DB
+
+```mariaDB
+SELECT * FROM wp_users;
+
 
 ### Adminer Service
 
