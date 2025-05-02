@@ -46,6 +46,11 @@ ___
     * [Doom Service](#doom-service)
   * [Tests](#tests)
     * [Mariadb Service](#mariadb-service-1)
+    * [Adminer Service](#adminer-service-1)
+    * [FTP Service](#ftp-service)
+  * [Notable Configuration Patterns](#notable-configuration-patterns)
+  * [References](#references)
+  * [Study Articles](#study-articles)
 
 <!-- mtoc-end -->
 
@@ -250,9 +255,10 @@ mariadb -u user -pdbpassword mariadb_db
 
 ```mariaDB
 SELECT * FROM wp_users;
-
+```
 
 ### Adminer Service
+
 
 * Open Adminer on Web Browser
 
