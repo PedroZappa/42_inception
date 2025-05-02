@@ -45,9 +45,9 @@ ___
     * [Adminer Service](#adminer-service)
     * [Doom Service](#doom-service)
   * [Tests](#tests)
-    * [Mariadb Service](#mariadb-service-1)
-    * [Adminer Service](#adminer-service-1)
-    * [FTP Service](#ftp-service)
+    * [Mariadb Tests](#mariadb-tests)
+    * [Adminer Tests](#adminer-tests)
+    * [FTP Tests](#ftp-tests)
   * [Notable Configuration Patterns](#notable-configuration-patterns)
   * [References](#references)
   * [Study Articles](#study-articles)
@@ -238,7 +238,7 @@ mari
 
 ## Tests
 
-### Mariadb Service
+### Mariadb Tests
 
 * Connect to MariaDB
 
@@ -257,8 +257,7 @@ mariadb -u user -pdbpassword mariadb_db
 SELECT * FROM wp_users;
 ```
 
-### Adminer Service
-
+### Adminer Tests
 
 * Open Adminer on Web Browser
 
@@ -272,7 +271,7 @@ http://localhost:8080/
 > Password: `dbpassword`
 > Database: `mariadb_db` (optional)
 
-### FTP Service
+### FTP Tests
 
 * Connect to FTP server
 
